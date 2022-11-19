@@ -36,12 +36,13 @@ CREATE TABLE Customer (
     city varchar,
     state varchar,
     zip char(5),
-    account_num int, --accountNum to find account owners
+    account_num int, -- account_num to find account owners
     PRIMARY KEY (customer_id),
     FOREIGN KEY (account_num) REFERENCES Account
 );
 
 CREATE TABLE Account (
+    account_id int REFERENCES Customer(customer_id) ON DELETE CASCADE, -- Something like this to delete the account if a customer is removed? Or the opposite?
     account_num int PRIMARY KEY UNIQUE,
     account_type varchar,
     balance int,
