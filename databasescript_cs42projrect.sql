@@ -54,7 +54,7 @@ CREATE TABLE Transactions (
     amount int,
     trans_type varchar,
     account_num int REFERENCES Account,
-    CONSTRAINT transaction_type_check CHECK (trans_type IN ('Deposit', 'Withdrawl', 'Transfer', 'external_transfer))
+    CONSTRAINT transaction_type_check CHECK (trans_type IN ('Deposit', 'Withdrawl', 'Transfer', 'external_transfer'))
 );
 
 CREATE TABLE Loan (
