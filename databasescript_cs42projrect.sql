@@ -3,48 +3,47 @@
  */
 CREATE TABLE Employee (
   ssn NUMERIC(9) PRIMARY KEY NOT NULL UNIQUE,
-  first_name varchar,
-  last_name varchar,
+  first_name varchar NOT NULL,
+  last_name varchar NOT NULL,
   salary numeric,
   street varchar,
   house_num int,
   city varchar,
   state varchar,
   zip char(5),
-  emp_role varchar,
+  emp_role varchar NOT NULL,
   works_at int REFERENCES Branch(branch_id)
   CONSTRAINT emp_role_check CHECK (emp_role IN ('Manager', 'Teller', 'Loan Specialist')) -- Something like this to check it?
   );
 
 CREATE TABLE Branch (
-    branch_id serial NOT NULL UNIQUE, -- Would create a ID automatically starting at 1 to better know which branch
+    branch_id serial PRIMARY KEY NOT NULL UNIQUE, -- Would create a ID automatically starting at 1 to better know which branch
     street varchar,
     house_num int,
     city varchar,
     state varchar,
-    zip char(5), --int has no size restriction so i made this a char type
-    PRIMARY KEY (street, house_num, city, state, zip)
+    zip char(5)
 );
 
 CREATE TABLE Customer (
     customer_id serial NOT NULL UNIQUE,
     home_branch int REFERENCES Branch(branch_id),
-    firstName varchar,
-    lastName varchar,
+    firstName varchar NOT NULL,
+    lastName varchar NOT NULL,
     street varchar,
     house_num int,
     city varchar,
     state varchar,
     zip char(5),
-    account_num int, -- account_num to find account owners
+    account_num int NOT NULL UNIQUE, -- account_num to find account owners
     PRIMARY KEY (customer_id),
     FOREIGN KEY (account_num) REFERENCES Account
 );
 
 CREATE TABLE Account (
     account_id int REFERENCES Customer(customer_id) ON DELETE CASCADE, -- Something like this to delete the account if a customer is removed? Or the opposite?
-    account_num int PRIMARY KEY UNIQUE,
-    account_type varchar,
+    account_num int PRIMARY KEY NOT NULL UNIQUE,
+    account_type varchar NOT NULL,
     balance int,
     CONSTRAINT account_type_check CHECK (account_type IN ('Checkings', 'Savings')) -- adding this in case it was the right way
 );
