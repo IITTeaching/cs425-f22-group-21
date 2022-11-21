@@ -10,8 +10,8 @@ DROP TABLE IF EXISTS Loan cascade;
  */
  
 CREATE TABLE Employee (
-  emp_ID serial PRIMARY KEY,
-  ssn NUMERIC(9) PRIMARY KEY,
+  emp_ID serial UNIQUE,
+  ssn NUMERIC(9) UNIQUE,
   first_name varchar NOT NULL,
   last_name varchar NOT NULL,
   salary numeric NOT NULL,
@@ -22,6 +22,7 @@ CREATE TABLE Employee (
   zip char(5) NOT NULL,
   emp_role varchar NOT NULL,
   works_at int REFERENCES Branch(branch_id),
+  PRIMARY KEY (emp_ID, ssn)
   CONSTRAINT emp_role_check CHECK (emp_role IN ('Manager', 'Teller', 'Loan Specialist'))
  );
 
@@ -76,5 +77,18 @@ CREATE TABLE Loan (
     FOREIGN KEY (account_num) REFERENCES Account
 );
 
-
+CREATE OR REPLACE FUNCTION get_loan(account_num int) RETURNS int --returns amount of money that user have to pay this month
+AS $$
+DECLARE
+	this_month INT;
+BEGIN
+	SELECT *
+	FROM loan
+	WHERE CASE
+			WHEN end_date < current_date THEN this_month = loan_amount*interest_schedule/100
+			WHEN end_date >= current_date THEN this_month = loan_amount + loan_amount*interest_schedule/100
+	END;
+	RETURN this_month;
+END;
+$$ Language plpgsql;
 
