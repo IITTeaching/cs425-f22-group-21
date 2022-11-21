@@ -22,7 +22,7 @@ CREATE TABLE Employee (
   zip char(5) NOT NULL,
   emp_role varchar NOT NULL,
   works_at int REFERENCES Branch(branch_id),
-  PRIMARY KEY (emp_ID, ssn)
+  PRIMARY KEY (emp_ID, ssn),
   CONSTRAINT emp_role_check CHECK (emp_role IN ('Manager', 'Teller', 'Loan Specialist'))
  );
 
@@ -85,8 +85,8 @@ BEGIN
 	SELECT *
 	FROM loan
 	WHERE CASE
-			WHEN end_date < current_date THEN this_month = loan_amount*interest_schedule/100
-			WHEN end_date >= current_date THEN this_month = loan_amount + loan_amount*interest_schedule/100
+			WHEN end_date <= current_date THEN this_month = loan_amount*interest_schedule/100
+			WHEN end_date > current_date THEN this_month = loan_amount + loan_amount*interest_schedule/100
 	END;
 	RETURN this_month;
 END;
