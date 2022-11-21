@@ -4,10 +4,6 @@ DROP TABLE IF EXISTS Customer cascade;
 DROP TABLE IF EXISTS Transactions cascade;
 DROP TABLE IF EXISTS Account cascade;
 DROP TABLE IF EXISTS Loan cascade;
-
-/*
- Need to add cascade delete calls, not null, function add/remove triggers
- */
  
 CREATE TABLE Employee (
   emp_ID serial UNIQUE,
@@ -58,6 +54,16 @@ CREATE TABLE Account (
     balance int NOT NULL,
     CONSTRAINT account_type_check CHECK (account_type IN ('Checking', 'Savings'))
 );
+
+CREATE TABLE accountType ( --specify details of different account types
+    account_type varchar NOT NULL,
+    interest_rate int NOT NULL,
+    allow_neg boolean NOT NULL,
+    overdraft_fee int NOT NULL,
+    monthly_fee int NOT NULL,
+    PRIMARY KEY (account_type)
+);
+
 
 CREATE TABLE Transactions (
     description text,
