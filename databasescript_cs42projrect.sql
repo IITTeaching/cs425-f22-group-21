@@ -1,5 +1,13 @@
+DROP TABLE IF EXISTS Employee cascade;
+DROP TABLE IF EXISTS Branch cascade;
+DROP TABLE IF EXISTS Customer cascade;
+DROP TABLE IF EXISTS Transactions cascade;
+DROP TABLE IF EXISTS Account cascade;
+DROP TABLE IF EXISTS Loan cascade;
+
+
 /*
- Need to add cascade delete calls, check relationships (check employee type eg)
+ Need to add cascade delete calls, not null, function add/remove triggers
  */
 CREATE TABLE Employee (
   ssn NUMERIC(9) PRIMARY KEY NOT NULL UNIQUE,
@@ -14,7 +22,7 @@ CREATE TABLE Employee (
   emp_role varchar NOT NULL,
   works_at int REFERENCES Branch(branch_id)
   CONSTRAINT emp_role_check CHECK (emp_role IN ('Manager', 'Teller', 'Loan Specialist')) -- Something like this to check it?
-  );
+  ); -- emp_role = 'Manager' OR emp_role = 'Teller' OR emp_role = 'Loan Specialist"
 
 CREATE TABLE Branch (
     branch_id serial PRIMARY KEY NOT NULL UNIQUE, -- Would create a ID automatically starting at 1 to better know which branch
@@ -45,7 +53,7 @@ CREATE TABLE Account (
     account_num int PRIMARY KEY NOT NULL UNIQUE,
     account_type varchar NOT NULL,
     balance int,
-    CONSTRAINT account_type_check CHECK (account_type IN ('Checkings', 'Savings')) -- adding this in case it was the right way
+    CONSTRAINT account_type_check CHECK (account_type IN ('Checking', 'Savings')) -- adding this in case it was the right way
 );
 
 CREATE TABLE Transactions (
@@ -53,7 +61,7 @@ CREATE TABLE Transactions (
     amount int,
     trans_type varchar,
     account_num int REFERENCES Account,
-    CONSTRAINT transaction_type_check CHECK (trans_type IN ('Deposit', 'Withdrawl', 'Transfer', 'external_transfer'))
+    CONSTRAINT transaction_type_check CHECK (trans_type IN ('Deposit', 'With draw', 'Transfer', 'external_transfer'))
 );
 
 CREATE TABLE Loan (
@@ -65,3 +73,6 @@ CREATE TABLE Loan (
     PRIMARY KEY (loan_amount, start_date, end_date, interest_schedule),
     FOREIGN KEY (account_num) REFERENCES Account
 );
+
+
+
