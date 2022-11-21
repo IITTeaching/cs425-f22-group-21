@@ -77,18 +77,4 @@ CREATE TABLE Loan (
     FOREIGN KEY (account_num) REFERENCES Account
 );
 
-CREATE OR REPLACE FUNCTION get_loan(account_num int) RETURNS int --returns amount of money that user have to pay this month
-AS $$
-DECLARE
-	this_month INT;
-BEGIN
-	SELECT *
-	FROM loan
-	WHERE CASE
-			WHEN end_date <= current_date THEN this_month = loan_amount*interest_schedule/100
-			WHEN end_date > current_date THEN this_month = loan_amount + loan_amount*interest_schedule/100
-	END;
-	RETURN this_month;
-END;
-$$ Language plpgsql;
 
