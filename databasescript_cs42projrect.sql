@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS Loan cascade;
  
 CREATE TABLE Employee (
   emp_ID serial UNIQUE,
-  ssn NUMERIC(9) UNIQUE,
+  ssn numeric(9) UNIQUE,
   first_name varchar NOT NULL,
   last_name varchar NOT NULL,
   salary numeric NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE Branch (
     city varchar NOT NULL,
     state varchar NOT NULL,
     zip char(5),
-    emp_ID_working int REFERENCES Employee(emp_ID) ON DELETE CASCADE
+    emp_ID int REFERENCES Employee ON DELETE CASCADE
 );
 
 CREATE TABLE Customer (
@@ -58,9 +58,10 @@ CREATE TABLE Account (
 CREATE TABLE accountType ( --specify details of different account types
     account_type varchar NOT NULL,
     interest_rate int NOT NULL,
-    allow_neg boolean NOT NULL,
+    allow_neg boolean NOT NULL DEFAULT FALSE,
     overdraft_fee int NOT NULL,
     monthly_fee int NOT NULL,
+    account_num int REFERENCES Account, -- would we need to add this to specify whose account we are talking about.
     PRIMARY KEY (account_type)
 );
 
@@ -70,7 +71,7 @@ CREATE TABLE Transactions (
     amount int NOT NULL,
     trans_type varchar NOT NULL,
     account_num int REFERENCES Account,
-    CONSTRAINT transaction_type_check CHECK (trans_type IN ('Deposit', 'With draw', 'Transfer', 'external_transfer'))
+    CONSTRAINT transaction_type_check CHECK (trans_type IN ('Deposit', 'Withdrawal', 'Transfer', 'External Transfer'))
 );
 
 CREATE TABLE Loan (
