@@ -29,7 +29,7 @@ CREATE TABLE Branch (
     city varchar NOT NULL,
     state varchar NOT NULL,
     zip char(5),
-    emp_ID int REFERENCES Employee ON DELETE CASCADE
+    --emp_ID int REFERENCES Employee ON DELETE CASCADE --I don't think we need this. employee and branch is referencing each other
 );
 
 CREATE TABLE Customer (
@@ -44,7 +44,7 @@ CREATE TABLE Customer (
     zip char(5) NOT NULL,
     account_num int,
     PRIMARY KEY (customer_id),
-    FOREIGN KEY (account_num) REFERENCES Account
+    --FOREIGN KEY (account_num) REFERENCES Account -- same reason as above / we can either make account references customer or customer references account
 );
 
 CREATE TABLE Account (
@@ -56,12 +56,12 @@ CREATE TABLE Account (
 );
 
 CREATE TABLE accountType ( --specify details of different account types
-    account_type varchar NOT NULL,
+    account_type varchar,
     interest_rate int NOT NULL,
     allow_neg boolean NOT NULL DEFAULT FALSE,
     overdraft_fee int NOT NULL,
     monthly_fee int NOT NULL,
-    account_num int REFERENCES Account, -- would we need to add this to specify whose account we are talking about.
+    account_num int REFERENCES Account, -- would we need to add this to specify whose account we are talking about. - yes we need it for foreign key
     PRIMARY KEY (account_type)
 );
 
