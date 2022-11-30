@@ -17,26 +17,24 @@ except:
 # Create a cursor
 cur = conn.cursor()
   
-while not(userInput = 1) and not(userInput = 2) and not(userInput = 3) and not(userInput = 4):
-  # Creating the interface for banking app upon starting
-  print("Welcome to the Banking Application\n")
-  print("1 - Customer Sign in")
-  print("2 - Customer Sign up")
-  print("3 - Employee Sign in")
-  print("4 - Exit")
-  userInput = int(input("Please choose an option to continue: "))
+print("Welcome to the Banking Application\n")
+print("1 - Customer Sign in")
+print("2 - Customer Sign up")
+print("3 - Employee Sign in")
+print("4 - Exit")
+userInput = int(input("Please choose an option to continue: "))
 
-  if userInput = 1:
+if userInput == 1:
     pass
-  elif userInput = 2:
+elif userInput == 2:
     pass
-  elif userInput = 3:
+elif userInput == 3:
     pass
-  elif userInput = 4:
+elif userInput == 4:
     print("\nExiting...")
     exit()
-  else:
-    print("Please choose an option from above.")
+else:
+    print("\nPlease choose an option from above.")
 
 # Close the cursor
 cur.close()
