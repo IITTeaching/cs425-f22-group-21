@@ -15,8 +15,9 @@ CREATE TABLE Address (
 );
  
 CREATE TABLE Employee (
-  emp_ID serial UNIQUE,
+  emp_ID varchar(15) UNIQUE,
   ssn numeric(9) UNIQUE,
+  password varchar(15) UNIQUE NOT NULL,
   first_name varchar NOT NULL,
   last_name varchar NOT NULL,
   salary numeric NOT NULL,
@@ -44,6 +45,8 @@ CREATE TABLE Customer (
 CREATE TABLE Account (
    account_id int REFERENCES Customer(customer_id) ON DELETE CASCADE,
    account_num int PRIMARY KEY,
+   username varchar(15) UNIQUE NOT NULL,
+   password varchar(15) NOT NULL,
    balance int NOT NULL
 );
 
