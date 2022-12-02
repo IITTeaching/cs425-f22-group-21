@@ -7,8 +7,7 @@ DROP TABLE IF EXISTS Loan cascade;
 
 CREATE TABLE Address (
   address_id serial PRIMARY KEY,
-  house_num int NOT NULL,
-  street text NOT NULL,
+  add text NOT NULL,
   city text NOT NULL,
   state text NOT NULL,
   zip char(5) NOT NULL
@@ -38,8 +37,9 @@ CREATE TABLE Customer (
   home_branch int REFERENCES Branch(branch_id),
   firstName varchar NOT NULL,
   lastName varchar NOT NULL,
+  username varchar(10) UNIQUE NOT NULL,
+  password varchar(12) UNIQUE NOT NULL,
   lives_at int REFERENCES Address(address_id),
-  account_num int,
 );
 
 CREATE TABLE Account (
