@@ -17,29 +17,127 @@ except:
 # Create a cursor
 cur = conn.cursor()
 
-def employeeControls(em_id, f):
-    print(f"\nHello {f[3]} {f[4]}! Position: {f[6]}")
+def c_id():
+    cur.execute("SELECT * FROM Customer ORDER BY customer_id DESC LIMIT 1")
+    id = cur.fetchone()
 
+    new_id = id[0] + 1;
+
+    return new_id
+
+def add_address():
+    try:
+        add = str(input("Enter address: "))
+        city = str(input("Enter city: "))
+        state = str(input("Enter state: "))
+        zip = str(input("Enter zip: "))
+
+        cur.execute("SELECT * FROM Address ORDER BY address_id DESC LIMIT 1")
+        add_id = cur.fetchone()
+
+        new_add = add_id[0] + 1;
+
+        cur.execute(f"INSERT INTO Address VALUES ({new_add}, '{add}', '{city}', '{state}', '{zip}');")
+        conn.commit()
+
+        return new_add
+
+    except:
+        print("Error occured while trying to add address.")
+        yesno = chr(input("Do you want to try again? (y/n): "))
+
+        if yesno.lower() == 'y':
+            add_address()
+        else:
+            pass
+
+def choose_homebranch():
+
+    # Still needs to be worked on
+
+    cur.execute("SELECT branch_id, add, city, state, zip FROM Branch LEFT JOIN Address ON branch_id = address_id;")
+    all_branches = cur.fetchall()
+
+    h_id=[]
+
+    for rows in all_branches:
+        h_id.append(int(rows[0]))
+        print(f"\nBranch ID: {rows[0]}, Address: {rows[1]} {rows[2]}, {rows[3]} {rows[4]}")
+
+    h_branch = 0
+
+    return h_branch
+
+def create_account():
+    try:
+        print("\nWelcome to Account Creation\n")
+        
+        fname = str(input("Enter first name: "))
+        lname = str(input("Enter last name: "))
+        address = add_address()
+        h_branch = choose_homebranch()
+        cust_id = c_id()
+        userName = input("Please enter a username (Max characters is 10): ")
+        password = input("Please enter a passoword (Max characters is 12): ")
+
+        cur.execute(f"INSERT INTO Customer VALUES ({cust_id}, {h_branch}, '{fname}', '{lname}', '{userName}', '{password}', '{address}');")
+        conn.commit()
+        
+    except:
+        print("Didnt work")
+
+def delete_account():
+    pass
+
+def account_transaction():
+    pass
+
+def account_managment():
     choice = 0
     while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
-        if f[6] == 'Manager':
+        print("\nAccount Management\n")
+        print("What would you like to do?")
+        print("1 - Create an account")
+        print("2 - Delete an account")
+        print("3 - Show statement for an account")
+        print("4 - Show pending transactions for an account")
+        print("5 - Add interest, overdraft fees, or account fees for an account")
+        choice = int(input("\nPlease choose an option to continue: "))
+
+        if choice == 1:
+            create_account()
+        elif choice == 2:
+            delete_account()
+        elif choice == 3:
+            pass
+        elif choice == 4:
+            pass
+        elif choice == 5:
+            pass
+        else:
+            print("\nPlease chooce an option from above")
+
+
+def analytics():
+    pass
+
+def employeeControls(em_id, f):
+    print(f"\nHello {f[3]} {f[4]}! Position: {f[6]}\n ID: {em_id}")
+
+    choice = 0
+    if f[6] == 'Manager':
+        while not(choice == 1 and choice == 2 and choice == 3):
             print("\nPlease, select an option from below:")
-            print("1 - Create an account")
-            print("2 - Delete an account")
-            print("3 - Account Transactions")
-            print("4 - Account Management")
-            print("5 - Analytics")
+            print("1 - Account Transactions")
+            print("2 - Account Management")
+            print("3 - Analytics")
             choice = int(input("\nPlease choose an option to continue: "))
 
             if choice == 1:
                 pass
             elif choice == 2:
-                pass
+                account_managment()
             elif choice == 3:
-                pass
-            elif choice == 4:
-                pass
-            elif choice == 5:
                 pass
             else:
                 print("\nPlease choose an option from above")
@@ -80,7 +178,7 @@ while not(userInput == 1 and userInput == 2 and  userInput == 3 and userInput ==
         exit()
     else:
         print("\nPlease choose an option from above.")
-
+      
 # Close the cursor
 cur.close()
 
