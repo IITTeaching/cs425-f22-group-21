@@ -50,7 +50,7 @@ def add_address():
 
     except:
         print("Error occured while trying to add address.")
-        yesno = chr(input("Do you want to try again? (y/n): "))
+        yesno = input("Do you want to try again? (y/n): ")
 
         if yesno.lower() == 'y':
             add_address()
@@ -129,13 +129,21 @@ def create_account():
     except:
         print("Didnt work.")
 
+# Customers, Managers only
+# Customers can only remove their own account
+# Don't know how this would really work though
 def delete_account():
     pass
 
+# Withdrawl, Deposit, Transfer, and External transfer
+# This can be accessed by managers, customers (for their own accounts), and tellers
 def account_transaction():
     pass
 
-# Manage accounts 
+# Manage accounts
+# Managers only have access to this information
+# There should also be an account management page for customers seperate from this one
+  # Account Management page for customers include: create, delete, show statement, and pending transactions
 def account_managment():
     choice = 0
     while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5 and choice == 6):
@@ -172,7 +180,7 @@ def analytics():
 # Controls for employees
 # So far only have done it for manager
 def employeeControls(em_id, f):
-    print(f"\nHello {f[3]} {f[4]}! Position: {f[6]}\n ID: {em_id}")
+    print(f"\nHello {f[3]} {f[4]}! Position: {f[6]}\nID: {em_id}")
 
     choice = 0
     if f[6] == 'Manager':
@@ -181,7 +189,7 @@ def employeeControls(em_id, f):
             print("1 - Account Transactions")
             print("2 - Account Management")
             print("3 - Analytics")
-            print("4 - Log out")
+            print("4 - Log out") 
             choice = int(input("\nPlease choose an option to continue: "))
 
             if choice == 1:
@@ -191,7 +199,7 @@ def employeeControls(em_id, f):
             elif choice == 3:
                 pass
             elif choice == 4:
-                print("\nLogging you out...")
+                print("\nLogging you out...") # Once they log out should they be brought back to the main screen instead of exiting?
                 exit(1)
             else:
                 print("\nPlease choose an option from above")
