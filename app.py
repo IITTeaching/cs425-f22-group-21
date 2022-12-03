@@ -17,14 +17,17 @@ except:
 # Create a cursor
 cur = conn.cursor()
 
+# Create a new customer ID
 def c_id():
-    cur.execute("SELECT * FROM Customer ORDER BY customer_id DESC LIMIT 1")
-    id = cur.fetchone()
+    cur.execute("SELECT customer_id FROM Customer ORDER BY customer_id DESC")
+    id = cur.fetchall()
 
-    new_id = id[0] + 1;
+    if len(id) == 0:
+        return 1
 
-    return new_id
+    return id[0] + 1
 
+# Add an address
 def add_address():
     try:
         add = str(input("Enter address: "))
@@ -32,10 +35,13 @@ def add_address():
         state = str(input("Enter state: "))
         zip = str(input("Enter zip: "))
 
-        cur.execute("SELECT * FROM Address ORDER BY address_id DESC LIMIT 1")
-        add_id = cur.fetchone()
-
-        new_add = add_id[0] + 1;
+        cur.execute("SELECT address_id FROM Address ORDER BY address_id DESC LIMIT 1")
+        add_id = cur.fetchall
+        
+        if len(add_id) == 0:
+            new_add = 1
+        else:
+            new_add = add_id[0] + 1;
 
         cur.execute(f"INSERT INTO Address VALUES ({new_add}, '{add}', '{city}', '{state}', '{zip}');")
         conn.commit()
@@ -51,23 +57,53 @@ def add_address():
         else:
             pass
 
-def choose_homebranch():
-
-    # Still needs to be worked on
-
+# Selecting a home branch
+def choose_branch():
     cur.execute("SELECT branch_id, add, city, state, zip FROM Branch LEFT JOIN Address ON branch_id = address_id;")
     all_branches = cur.fetchall()
 
-    h_id=[]
+    h_ids=[]
 
     for rows in all_branches:
-        h_id.append(int(rows[0]))
+        h_ids.append(int(rows[0]))
         print(f"\nBranch ID: {rows[0]}, Address: {rows[1]} {rows[2]}, {rows[3]} {rows[4]}")
-
+    
     h_branch = 0
+
+    while h_branch not in h_ids:
+        h_branch = int(input("Choose a home branch: "))
 
     return h_branch
 
+# For bank account creation - Checkings OR Savings
+def checks_savings(c_id, un, p):
+    choice = 0
+    account_num = ''.join(random.choice(string.digits) for _ in range(10))
+
+    balance = input("Enter a starting balance for your account: ") # Don't know what to really put for the balance part of it
+
+    while not(choice == 1 and choice == 2):
+        print("\nChoose the account type")
+        print("1 - Checkings")
+        print("2 - Savings")
+        choice = int(input("Please choose one: "))
+    
+    if choice == 1:
+        try:
+            cur.execute(f"INSERT INTO Account VALUES ({c_id}, {account_num}, '{un}', '{p}', {balance});")
+            cur.execute(f"INSERT INTO AccountType VALUES ('Checkings', {0}, 'FALSE', {0}, {0}, {c_id});")
+            conn.commit()
+        except:
+            print("Didn't work.")
+    else:
+        try:
+            cur.execute(f"INSERT INTO Account VALUES ({c_id}, {account_num}, '{un}', '{p}', {balance});")
+            cur.execute(f"INSERT INTO AccountType VALUES ('Savings', {0}, 'FALSE', {0}, {0}, {c_id});")
+            conn.commit()
+        except:
+            print("Didn't work.")
+
+# Create a customer account
 def create_account():
     try:
         print("\nWelcome to Account Creation\n")
@@ -75,16 +111,23 @@ def create_account():
         fname = str(input("Enter first name: "))
         lname = str(input("Enter last name: "))
         address = add_address()
-        h_branch = choose_homebranch()
+        h_branch = choose_branch()
         cust_id = c_id()
         userName = input("Please enter a username (Max characters is 10): ")
         password = input("Please enter a passoword (Max characters is 12): ")
 
-        cur.execute(f"INSERT INTO Customer VALUES ({cust_id}, {h_branch}, '{fname}', '{lname}', '{userName}', '{password}', '{address}');")
+        cur.execute(f"INSERT INTO Customer VALUES ({cust_id}, {h_branch}, '{fname}', '{lname}', '{address}');")
         conn.commit()
+
+        checks_savings(cust_id, userName, password)
+
+        print(f"\nSuccessfully created an account for {fname} {lname}!\n")
+        print("\nBring you back to Account Management page...")
+
+        account_managment()
         
     except:
-        print("Didnt work")
+        print("Didnt work.")
 
 def delete_account():
     pass
@@ -92,9 +135,10 @@ def delete_account():
 def account_transaction():
     pass
 
+# Manage accounts 
 def account_managment():
     choice = 0
-    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
+    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5 and choice == 6):
         print("\nAccount Management\n")
         print("What would you like to do?")
         print("1 - Create an account")
@@ -102,6 +146,7 @@ def account_managment():
         print("3 - Show statement for an account")
         print("4 - Show pending transactions for an account")
         print("5 - Add interest, overdraft fees, or account fees for an account")
+        print("6 - Log out")
         choice = int(input("\nPlease choose an option to continue: "))
 
         if choice == 1:
@@ -114,6 +159,9 @@ def account_managment():
             pass
         elif choice == 5:
             pass
+        elif choice == 6:
+            print("\nLogging you out...")
+            exit(1)
         else:
             print("\nPlease chooce an option from above")
 
@@ -121,16 +169,19 @@ def account_managment():
 def analytics():
     pass
 
+# Controls for employees
+# So far only have done it for manager
 def employeeControls(em_id, f):
     print(f"\nHello {f[3]} {f[4]}! Position: {f[6]}\n ID: {em_id}")
 
     choice = 0
     if f[6] == 'Manager':
-        while not(choice == 1 and choice == 2 and choice == 3):
+        while not(choice == 1 and choice == 2 and choice == 3 and choice == 4):
             print("\nPlease, select an option from below:")
             print("1 - Account Transactions")
             print("2 - Account Management")
             print("3 - Analytics")
+            print("4 - Log out")
             choice = int(input("\nPlease choose an option to continue: "))
 
             if choice == 1:
@@ -139,9 +190,14 @@ def employeeControls(em_id, f):
                 account_managment()
             elif choice == 3:
                 pass
+            elif choice == 4:
+                print("\nLogging you out...")
+                exit(1)
             else:
                 print("\nPlease choose an option from above")
 
+# Employee Sign in
+# Searches for ID and Password match
 def employeeSignIn():
     while True:
         print("\nEmployee Sign in\n")
@@ -175,7 +231,7 @@ while not(userInput == 1 and userInput == 2 and  userInput == 3 and userInput ==
         employeeSignIn()
     elif userInput == 4:
         print("\nExiting...")
-        exit()
+        exit(1)
     else:
         print("\nPlease choose an option from above.")
       
