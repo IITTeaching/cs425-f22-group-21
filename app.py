@@ -35,7 +35,7 @@ def add_address():
         state = str(input("Enter state: "))
         zip = str(input("Enter zip: "))
 
-        cur.execute("SELECT address_id FROM Address ORDER BY address_id DESC LIMIT 1")
+        cur.execute("SELECT address_id FROM Address ORDER BY address_id DESC;")
         add_id = cur.fetchall
         
         if len(add_id) == 0:
@@ -122,9 +122,9 @@ def create_account():
         checks_savings(cust_id, userName, password)
 
         print(f"\nSuccessfully created an account for {fname} {lname}!\n")
-        print("\nBring you back to Account Management page...")
-
-        account_managment()
+        
+        print("\nBring you back to Account Management page...") # Needs to be brought back to account management page for employees only
+        account_managment() 
         
     except:
         print("Didnt work.")
