@@ -138,7 +138,29 @@ def delete_account():
 # Withdrawl, Deposit, Transfer, and External transfer
 # This can be accessed by managers, customers (for their own accounts), and tellers
 def account_transaction():
-    pass
+    choice = 0
+    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4):
+        print("\nPlease, select an option from below:")
+        print("1 - Withdrawl")
+        print("2 - Deposit")
+        print("3 - Transfer")
+        print("4 - External transfer")
+        print("5 - Log out") # or maybe go back or main
+        choice = int(input("\nPlease choose an option to continue: "))
+
+        if choice == 1:
+            pass
+        elif choice == 2:
+            pass
+        elif choice == 3:
+            pass
+        elif choice == 4:
+            pass
+        elif choice == 5:
+            print("\nLogging you out...") 
+            exit(1)
+        else:
+            print("Please choose an option from above")
 
 # Manage accounts
 # Managers only have access to this information
@@ -177,32 +199,35 @@ def account_managment():
 def analytics():
     pass
 
+#def loan():
+#   pass
+ 
 # Controls for employees
 # So far only have done it for manager
 def employeeControls(em_id, f):
     print(f"\nHello {f[3]} {f[4]}! Position: {f[6]}\nID: {em_id}")
 
     choice = 0
-    if f[6] == 'Manager':
-        while not(choice == 1 and choice == 2 and choice == 3 and choice == 4):
-            print("\nPlease, select an option from below:")
-            print("1 - Account Transactions")
-            print("2 - Account Management")
-            print("3 - Analytics")
-            print("4 - Log out") 
-            choice = int(input("\nPlease choose an option to continue: "))
+    #if f[6] == 'Manager':
+    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4):
+        print("\nPlease, select an option from below:")
+        print("1 - Account Transactions")
+        print("2 - Account Management")
+        print("3 - Analytics")
+        print("4 - Log out") #loan maybe
+        choice = int(input("\nPlease choose an option to continue: "))
 
-            if choice == 1:
-                pass
-            elif choice == 2:
-                account_managment()
-            elif choice == 3:
-                pass
-            elif choice == 4:
-                print("\nLogging you out...") # Once they log out should they be brought back to the main screen instead of exiting?
-                exit(1)
-            else:
-                print("\nPlease choose an option from above")
+        if choice == 1 and (f[6] == 'Manager' or 'Teller'):
+            pass #account_transaction()
+        elif choice == 2 and f[6] == 'Manager':
+            account_managment()
+        elif choice == 3 and f[6] == 'Manager':
+            pass #analytics()
+        elif choice == 4:
+            print("\nLogging you out...") # Once they log out should they be brought back to the main screen instead of exiting?
+            exit(1)
+        else:
+            print("No authority or choose an option from above")
 
 # Employee Sign in
 # Searches for ID and Password match
