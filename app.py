@@ -247,6 +247,65 @@ def employeeSignIn():
         else:
             print("ID and/or Password is invalid. Try again.")
 
+def transfer (c_id, f):
+    other_accountid = int(input("\nPlease insert account number to transfer money to: "))
+    cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(c_id))
+    my_account = cur.fetchone()
+    cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(other_accountid))
+    other_account = cur.fetchone()
+
+    amount = int(input("\nHow much would you like to transfer to another account?"))
+
+    choice = 0
+    while not (choice == 1 and choice == 2):
+        print('\n Please, confirm the transaction:')
+        print("1 - yes")
+        print("2 - no")
+        choice = int(input("\nPlease choose an option to continue: "))
+
+        if choice == 1:
+            my_new_balance = my_account[4] - amount
+            other_new_balance = other_account[4] + amount
+            sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(my_new_balance, my_account)
+            cur.execute(sql)
+            sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(other_new_balance, other_account)
+            cur.execute(sql)
+
+            print(f"\n Your current balance is :{my_new_balance[5]}")
+            print("\nRedirecting to customer controls...")
+            customerControls(c_id, f)
+
+        elif choice == 2:
+            print("\nRedirecting to customer controls...")
+            customerControls(c_id, f)
+        else:
+            print("No authority or choose an option from above")
+
+def deposit (c_id, f):
+    amount = int(input("\nHow much would you like to deposit to your account?"))
+    cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(c_id))
+    account = cur.fetchone()
+    print("\n depositing " + amount + " to your current balance of " + account[4])
+    choice = 0
+    while not (choice == 1 and choice == 2):
+        print('\n Please, confirm the transaction:')
+        print("1 - yes")
+        print("2 - no")
+        choice = int(input("\nPlease choose an option to continue: "))
+
+        if choice == 1:
+            new_balance = account[4] + amount
+            sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(new_balance, c_id)
+            cur.execute(sql)
+            print(f"\n Your current balance is :{account[5]}")
+            print("\nRedirecting to customer controls...")
+            customerControls(c_id, f)
+
+        elif choice == 2:
+            print("\nRedirecting to customer controls...")
+            customerControls(c_id, f)
+        else:
+            print("No authority or choose an option from above")
 def withdrawal(c_id, f):
     amount = int(input("\nHow much would you like to withdraw from your account?"))
     cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(c_id))
@@ -284,14 +343,11 @@ def c_account_transaction(c_id, f):
         choice = int(input("\nPlease choose an option to continue: "))
 
         if choice == 1:
-            withdrawal(c_id,f)
-            pass
+            withdrawal(c_id, f)
         elif choice == 2:
-            #deposit
-            pass
+            deposit(c_id, f)
         elif choice == 3:
-            #transfer
-            pass
+            transfer(c_id, f)
         elif userInput == 4:
             print("\nRedirecting to customer controls...")
             customerControls(c_id, f)
