@@ -15,3 +15,7 @@ INSERT INTO Employee VALUES
 ('ABC1234', 123456789, 'example123', 'Harsha', 'Pillai', 130000, 'Manager', 2, 1),
 ('A506790', 908908003, 'password', 'Erik', 'Pacheco', 45000, 'Bank Teller', 3, 1),
 ('L908769', 303789023, 'examplepass', 'Jungwoo', 'Hwang', 180000, 'Manager', 5, 4);
+
+INSERT INTO Customer VALUES
+(0, 'customer1', 'customerpassword', 1, 'Taylor', 'Adam', 1),
+(1, 'customer2', 'customerpassword2', 2, 'Annie', 'George', 2);
