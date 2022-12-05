@@ -30,32 +30,26 @@ def c_id():
 # Add an address
 def add_address():
     try:
-        add = str(input("Enter address: "))
-        city = str(input("Enter city: "))
-        state = str(input("Enter state: "))
-        zip = str(input("Enter zip: "))
+        street_name = input("Enter address: ")
+        city = input("Enter city: ")
+        state = input("Enter state: ")
+        zip_code = input("Enter zip: ")
 
         cur.execute("SELECT address_id FROM Address ORDER BY address_id DESC;")
-        add_id = cur.fetchall
-        
-        if len(add_id) == 0:
-            new_add = 1
-        else:
-            new_add = add_id[0] + 1;
+        all_ids = cur.fetchone()
 
-        cur.execute(f"INSERT INTO Address VALUES ({new_add}, '{add}', '{city}', '{state}', '{zip}');")
+        if len(all_ids) == 0:
+            new_id = 1
+        else:
+            new_id = int(all_ids[0] + 1)
+
+        cur.execute(f"INSERT INTO Address VALUES ({new_id}, '{street_name}', '{city}', '{state}', '{zip_code}');")
         conn.commit()
 
-        return new_add
-
-    except:
-        print("Error occured while trying to add address.")
-        yesno = input("Do you want to try again? (y/n): ")
-
-        if yesno.lower() == 'y':
-            add_address()
-        else:
-            pass
+        return new_id
+        
+    except Exception as e:
+        print("Oops!", e, "occured")
 
 # Selecting a home branch
 def choose_branch():
