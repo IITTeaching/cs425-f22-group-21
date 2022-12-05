@@ -33,6 +33,8 @@ CREATE TABLE Employee (
 
 CREATE TABLE Customer (
   customer_id serial PRIMARY KEY,
+  customer_username varchar(15) NOT NULL,
+  customer_password varchar(15) UNIQUE NOT NULL,
   home_branch int REFERENCES Branch(branch_id),
   first_name text NOT NULL,
   last_name text NOT NULL,

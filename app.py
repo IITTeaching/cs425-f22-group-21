@@ -116,8 +116,9 @@ def create_account():
         userName = input("Please enter a username (Max characters is 10): ")
         password = input("Please enter a passoword (Max characters is 12): ")
 
-        cur.execute(f"INSERT INTO Customer VALUES ({cust_id}, {h_branch}, '{fname}', '{lname}', '{address}');")
+        cur.execute(f"INSERT INTO Customer VALUES ({cust_id}, {userName}, {password}, {h_branch}, '{fname}', '{lname}', '{address}');")
         conn.commit()
+
 
         checks_savings(cust_id, userName, password)
 
@@ -246,6 +247,97 @@ def employeeSignIn():
         else:
             print("ID and/or Password is invalid. Try again.")
 
+def withdrawal(c_id, f):
+    amount = int(input("\nHow much would you like to withdraw from your account?"))
+    cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(c_id))
+    account = cur.fetchone()
+    print("\n withdrawing " + amount + " to your current balance of " + account[4])
+    choice = 0
+    while not (choice == 1 and choice == 2):
+        print('\n Please, confirm the transaction:')
+        print("1 - yes")
+        print("2 - no")
+        choice = int(input("\nPlease choose an option to continue: "))
+
+        if choice == 1:
+            new_balance = account[4] - amount
+            sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(new_balance, c_id)
+            cur.execute(sql)
+            print(f"\n Your current balance is :{account[5]}")
+            print("\nRedirecting to customer controls...")
+            customerControls(c_id, f)
+
+        elif choice == 2:
+            print("\nRedirecting to customer controls...")
+            customerControls(c_id, f)
+        else:
+            print("No authority or choose an option from above")
+
+def c_account_transaction(c_id, f):
+    choice = 0
+    while not (choice == 1 and choice == 2 and choice == 3 and choice == 4):
+        print("\nPlease, select an option from below:")
+        print("1 - Withdrawal")
+        print("2 - Deposit")
+        print("3 - Transfer")
+        print("4 - Exit")
+        choice = int(input("\nPlease choose an option to continue: "))
+
+        if choice == 1:
+            withdrawal(c_id,f)
+            pass
+        elif choice == 2:
+            #deposit
+            pass
+        elif choice == 3:
+            #transfer
+            pass
+        elif userInput == 4:
+            print("\nRedirecting to customer controls...")
+            customerControls(c_id, f)
+        else:
+            print("No authority or choose an option from above")
+
+# Customer Sign in
+# Searches for ID and Password match
+def customerControls(c_id, f):
+    print(f"\nHello {f[4]} {f[5]}! \nID: {c_id}")
+
+    choice = 0
+    while not (choice == 1 and choice == 2 and choice == 3 and choice == 4):
+        print("\nPlease, select an option from below:")
+        print("1 - Account Transactions")
+        print("2 - Account Management")
+        print("3 - Log out")
+        choice = int(input("\nPlease choose an option to continue: "))
+
+        if choice == 1:
+            c_account_transaction(c_id, f)
+        elif choice == 2:
+            #c_account_managment()
+            pass
+        elif choice == 3:
+            print(
+                "\nLogging you out...")
+            exit(1)
+        else:
+            print("No authority or choose an option from above")
+
+def customerSignIn():
+    while True:
+        print("\nCustomer Sign in\n")
+        c_username = input("Please enter your username: ")
+        c_password = input("Enter your password: ")
+
+        # Execute SQL Code & Fetch
+        cur.execute("SELECT * FROM Customer WHERE customer_username = '{}' AND customer_password = '{}'".format(c_username, c_password))
+        found = cur.fetchone()
+
+        if (found):
+            customerControls(found[0], found)
+        else:
+            print("ID and/or Password is invalid. Try again.")
+
 # Main
 userInput = 0
 while not(userInput == 1 and userInput == 2 and  userInput == 3 and userInput == 4):
@@ -257,9 +349,9 @@ while not(userInput == 1 and userInput == 2 and  userInput == 3 and userInput ==
     userInput = int(input("\nPlease choose an option to continue: "))
 
     if userInput == 1:
-        pass
+        customerSignIn()
     elif userInput == 2:
-        pass
+        create_account()  # need to change the page they are brought back to-- currently goes to account management
     elif userInput == 3:
         employeeSignIn()
     elif userInput == 4:
