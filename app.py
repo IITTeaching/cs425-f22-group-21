@@ -1,9 +1,9 @@
 import psycopg2
 
 connection = {
- "dbname": "example",
+ "dbname": "postgres",
  "user": "postgres",
- "password": "test",
+ "password": "qwer1234",
  "port": 5432
 }
 
@@ -562,7 +562,7 @@ def c_show_pending_trans(c_id):
 # Customer show statement
 def c_show_statement(c_id):
     input_mon = input("Enter specific month to see statement: ")
-    cur.execute("SELECT * FROM Transactions WHERE account_id = {} and month(trans_time) = {}".format(c_id, input_mon))
+    cur.execute("SELECT * FROM Transactions WHERE date_part('month', transaction_date) = {}".format(c_id, input_mon))
     statement = cur.fetchall()
     print(statement)
     c_account_management(c_id)
@@ -571,7 +571,7 @@ def c_show_statement(c_id):
 def e_show_statement(e_id, f):
     input_id = input("Enter account id to see statement: ")
     input_mon = input("Enter specific month to see statement: ")
-    cur.execute("SELECT * FROM Transactions WHERE account_id = {} and month(trans_time) = {}".format(input_id, input_mon))
+    cur.execute("SELECT * FROM (SELECT * FROM Transactions WHERE date_part('month', transaction_date) = {}) l WHERE account_id = {}".format(input_mon, input_id, input_mon))
     statement = cur.fetchall()
     print(statement)
     e_account_management(e_id, f)
