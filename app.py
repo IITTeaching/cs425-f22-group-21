@@ -471,6 +471,54 @@ def c_delete_account():
         print(e, "Error occured while delete account.")
         print("Redirecting back to Account Management Page....")
         c_account_management()
+        
+# Withdrawl, Deposit, Transfer, and External transfer - Employees
+def e_account_transaction(e_id, f):
+    choice = 0
+    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
+        print("\nPlease, select an option from below:")
+        print("1 - Withdrawl")
+        print("2 - Deposit")
+        print("3 - Transfer")
+        print("4 - External transfer")
+        print("5 - Go back")
+        choice = int(input("\nPlease choose an option to continue: "))
+
+        if choice == 1:
+            e_Withdrawl(e_id, f)
+        elif choice == 2:
+            e_deposit(e_id, f)
+        elif choice == 3:
+            e_transfer(e_id, f)
+        elif choice == 4:
+            e_external_transfer(e_id, f)
+        elif choice == 5:
+            employee_controls(e_id, f)
+        else:
+            print("Please choose an option from above")
+  
+# Withdrawl, Deposit, Transfer, and External transfer - Customer
+def c_account_transaction(c_id):
+    choice = 0
+    while not (choice == 1 and choice == 2 and choice == 3 and choice == 4):
+        print("\nPlease, select an option from below:")
+        print("1 - Withdrawal")
+        print("2 - Deposit")
+        print("3 - Transfer")
+        print("4 - Exit")
+        choice = int(input("\nPlease choose an option to continue: "))
+
+        if choice == 1:
+            c_withdrawal(c_id)
+        elif choice == 2:
+            c_deposit(c_id)
+        elif choice == 3:
+            c_transfer(c_id)
+        elif userInput == 4:
+            print("\nRedirecting to customer controls...")
+            customer_controls(c_id)
+        else:
+            print("No authority or choose an option from above")
           
 # Employee account managemet
 def e_account_management(e_id, f):
@@ -503,34 +551,13 @@ def e_account_management(e_id, f):
 def e_show_pending_trans(e_id, f):
     pass
 
+# We need to make them choose from what month they want to see
 def e_show_statement(e_id, f):
     input_id = input("Enter account id to see statement: ")
     cur.execute(f"SELECT * FROM Transactions WHERE account_id = {input_id}")
     statement = cur.fetchall()
     print(statement)
     e_account_management(e_id, f)
-
-def c_account_transaction(c_id):
-    choice = 0
-    while not (choice == 1 and choice == 2 and choice == 3 and choice == 4):
-        print("\nPlease, select an option from below:")
-        print("1 - Withdrawal")
-        print("2 - Deposit")
-        print("3 - Transfer")
-        print("4 - Exit")
-        choice = int(input("\nPlease choose an option to continue: "))
-
-        if choice == 1:
-            c_withdrawal(c_id)
-        elif choice == 2:
-            c_deposit(c_id)
-        elif choice == 3:
-            c_transfer(c_id)
-        elif userInput == 4:
-            print("\nRedirecting to customer controls...")
-            customer_controls(c_id)
-        else:
-            print("No authority or choose an option from above")
 
 # Customer controls
 def customer_controls(c_id):
@@ -624,9 +651,9 @@ def e_analytics(employee_id, f):
         avg_balance = [0]
         tot_balance = [0]
     print(f"Analytic of branch {employee[8]}: \n\
--Number of employees: {tot_emp[0]}\n manager: {num_manager[0]}\n teller: {num_teller[0]}\n loan specialist: {num_loansp[0]}\n\
--Salary:\n manager: {avg_salary_manager[0]}\n teller: {avg_salary_teller[0]}\n loan specialist: {avg_salary_loansp[0]}\n\
--Customer:\n number of customer: {num_customer[0]}\n averager balance: {avg_balance[0]}\n total balance {tot_balance[0]}")
+            -Number of employees: {tot_emp[0]}\n manager: {num_manager[0]}\n teller: {num_teller[0]}\n loan specialist: {num_loansp[0]}\n\
+            -Salary:\n manager: {avg_salary_manager[0]}\n teller: {avg_salary_teller[0]}\n loan specialist: {avg_salary_loansp[0]}\n\
+            -Customer:\n number of customer: {num_customer[0]}\n averager balance: {avg_balance[0]}\n total balance {tot_balance[0]}")
     
 # Employee controls
 def employee_controls(e_id, f):
