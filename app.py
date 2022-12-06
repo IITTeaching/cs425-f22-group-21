@@ -571,8 +571,47 @@ def e_account_management(f):
         else:
             print("\nPlease chooce an option from above")
           
+def analytics(employee_id):
+    cur.execute("SELECT * FROM Employee WHERE emp_ID = '{}';".format(employee_id))
+    employee = cur.fetchone()
+    cur.execute("SELECT count(*) FROM (SELECT * FROM Employee WHERE works_at = {}) l".format(employee[8]))
+    tot_emp = cur.fetchone()
+    cur.execute("SELECT count(*) FROM (SELECT * FROM Employee WHERE works_at = {} and emp_role = 'Manager') l GROUP BY emp_role".format(employee[8]))
+    num_manager = cur.fetchone()
+    cur.execute("SELECT count(*) FROM (SELECT * FROM Employee WHERE works_at = {} and emp_role = 'Teller') l GROUP BY emp_role".format(employee[8]))
+    num_teller = cur.fetchone()
+    cur.execute("SELECT count(*) FROM (SELECT * FROM Employee WHERE works_at = {} and emp_role = 'Loan Specialist') l GROUP BY emp_role".format(employee[8]))
+    num_loansp = cur.fetchone()
+    cur.execute("SELECT avg(salary) FROM (SELECT * FROM Employee WHERE works_at = {} and emp_role = 'Manager') l GROUP BY emp_role".format(employee[8]))
+    avg_salary_manager = cur.fetchone()
+    cur.execute("SELECT avg(salary) FROM (SELECT * FROM Employee WHERE works_at = {} and emp_role = 'Teller') l GROUP BY emp_role".format(employee[8]))
+    avg_salary_teller = cur.fetchone()
+    cur.execute("SELECT avg(salary) FROM (SELECT * FROM Employee WHERE works_at = {} and emp_role = 'Loan Specialist') l GROUP BY emp_role".format(employee[8]))
+    avg_salary_loansp = cur.fetchone()
+    cur.execute("SELECT count(*) FROM Customer WHERE home_branch = {}".format(employee[8]))
+    num_customer = cur.fetchone()
+    cur.execute("SELECT avg(balance) FROM (SELECT * FROM Account WHERE account_id IN (SELECT customer_id FROM Customer WHERE home_branch = {}) ) l".format(employee[8]))
+    avg_balance = cur.fetchone()
+    cur.execute("SELECT sum(balance) FROM (SELECT * FROM Account WHERE account_id IN (SELECT customer_id FROM Customer WHERE home_branch = {})) l".format(employee[8]))
+    tot_balance = cur.fetchone()
+    print("\n", tot_balance, "\n")
+    if num_teller == None:
+        num_teller = [0]
+        avg_salary_teller = [0]
+    if num_loansp == None:
+        num_loansp = [0]
+        avg_salary_loansp = [0]
+    if num_customer == None:
+        num_customer = [0]
+        avg_balance = [0]
+        tot_balance = [0]
+    print(f"Analytic of branch {employee[8]}: \n\
+-Number of employees: {tot_emp[0]}\n manager: {num_manager[0]}\n teller: {num_teller[0]}\n loan specialist: {num_loansp[0]}\n\
+-Salary:\n manager: {avg_salary_manager[0]}\n teller: {avg_salary_teller[0]}\n loan specialist: {avg_salary_loansp[0]}\n\
+-Customer:\n number of customer: {num_customer[0]}\n averager balance: {avg_balance[0]}\n total balance {tot_balance[0]}")
+    
 # Employee controls
-def employee_controls(f):
+def employee_controls(e_id, f):
     print("\nWelcome to Employee Controls!\n")
 
     choice = 0
@@ -589,7 +628,7 @@ def employee_controls(f):
         elif choice == 2 and f[6] == 'Manager':
             e_account_management(f)
         elif choice == 3 and f[6] == 'Manager':
-            pass
+            analytics(e_id)
         elif choice == 4:
             print("\nLooging you out...")
             exit(1)
@@ -626,7 +665,7 @@ def employeeSignIn():
 
         if found:
             print(f"\nHello {found[3]} {found[4]}!\nPosition: {found[6]}\nID: {found[0]}")
-            employee_controls(found)
+            employee_controls(em_id, found)
         else:
             print("ID and/or Password is invalid. Try again.")
 
