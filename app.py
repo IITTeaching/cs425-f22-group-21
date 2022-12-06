@@ -528,8 +528,8 @@ def c_account_transaction(c_id):
         else:
             print("No authority or choose an option from above")
           
-# Employee account managemet
-def e_account_management(e_id, f):
+# Customer account managemet
+def c_account_management(c_id, f):
     print("\nCustomer Account Management Page\n")
 
     choice = 0
@@ -543,29 +543,38 @@ def e_account_management(e_id, f):
         choice = int(input("\nPlease choose an option to continue: "))
 
         if choice == 1:
-            e_create_account(e_id, f)
+            c_create_account(c_id, f)
         elif choice == 2:
-            e_delete_account(e_id, f)
+            c_delete_account(c_id, f)
         elif choice == 3:
-            e_show_statement(e_id, f)
+            c_show_statement(c_id, f)
         elif choice == 4:
-            e_show_pending_trans(e_id, f)
+            c_show_pending_trans(c_id, f)
         elif choice == 5:
-            employee_controls(e_id, f)
+            customer_controls(c_id, f)
         else:
             print("Invalid choice.")
 
 # Not sure what to do on pending transaction
-def e_show_pending_trans(e_id, f):
+def c_show_pending_trans(c_id, f):
     pass
 
-# We need to make them choose from what month they want to see
-def e_show_statement(e_id, f):
-    input_id = input("Enter account id to see statement: ")
-    cur.execute(f"SELECT * FROM Transactions WHERE account_id = {input_id}")
+# Customer show statement
+def c_show_statement(c_id, f):
+    input_mon = input("Enter specific month to see statement: ")
+    cur.execute("SELECT * FROM Transactions WHERE account_id = {} and month(trans_time) = {}".format(input_id, input_mon)
     statement = cur.fetchall()
     print(statement)
-    e_account_management(e_id, f)
+    e_account_management(c_id, f)
+
+# Employee show statement
+def e_show_statement(f):
+    input_id = input("Enter account id to see statement: ")
+    input_mon = input("Enter specific month to see statement: ")
+    cur.execute("SELECT * FROM Transactions WHERE account_id = {} and month(trans_time) = {}".format(input_id, input_mon)
+    statement = cur.fetchall()
+    print(statement)
+    e_account_management(f)
 
 # Customer controls
 def customer_controls(c_id):
@@ -593,7 +602,7 @@ def customer_controls(c_id):
 # Managers only have access to this information
 # There should also be an account management page for customers seperate from this one
 # Account Management page for customers include: create, delete, show statement, and pending transactions
-def c_account_management(f):
+def e_account_management(e_id, f):
     print("\nManager Account Management Page\n")
 
     choice = 0
@@ -612,7 +621,7 @@ def c_account_management(f):
         elif choice == 2:
             e_delete_account(f)
         elif choice == 3:
-            pass
+            e_show_statement(f)
         elif choice == 4:
             pass
         elif choice == 5:
