@@ -55,7 +55,7 @@ def e_Withdrawl(e_id, f):
     try:
         input_num = int(input("Enter account number: "))
         cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_num))
-        acc = cur.fetchall()
+        acc = cur.fetchone()
         input_amount = int(input("Enter amount of money to withdraw: "))
         print("Withdraw {amount} from account number {ac_num}?".format(amount = input_amount, ac_num = input_num))
         print("1 - yes")
@@ -82,7 +82,7 @@ def e_deposit(e_id, f):
     try:
         input_num = int(input("Enter account number: "))
         cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_num))
-        acc = cur.fetchall()
+        acc = cur.fetchone()
         input_amount = int(input("Enter amount of money to deposit: "))
         print("Deposit {amount} from account number {ac_num}?".format(amount = input_amount, ac_num = input_num))
         print("1 - yes")
@@ -111,9 +111,9 @@ def e_transfer(e_id, f):
         input_from = int(input("transfer from: "))
         input_to = int(input("transfer to: "))
         cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_from))
-        acc_from = cur.fetchall()
+        acc_from = cur.fetchone()
         cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_to))
-        acc_to = cur.fetchall()
+        acc_to = cur.fetchone()
         input_amount = int(input("Enter amount of money to transfer: "))
         print("transfer {amount} from account number {ac_num1} to account number {ac_num2}?".format(amount = input_amount, ac_num1 = input_from, ac_num2 = input_to))
         print("1 - yes")
@@ -162,11 +162,11 @@ def c_transfer (c_id):
 
             print(f"\n Your current balance is :{my_new_balance[5]}")
             print("\nRedirecting to customer controls...")
-            customerControls(c_id)
+            customer_controls(c_id)
 
         elif choice == 2:
             print("\nRedirecting to customer controls...")
-            customerControls(c_id)
+            customer_controls(c_id)
         else:
             print("No authority or choose an option from above")
 
@@ -189,11 +189,11 @@ def c_deposit (c_id):
             cur.execute(sql)
             print(f"\n Your current balance is :{account[5]}")
             print("\nRedirecting to customer controls...")
-            customerControls(c_id)
+            customer_controls(c_id)
 
         elif choice == 2:
             print("\nRedirecting to customer controls...")
-            customerControls(c_id)
+            customer_controls(c_id)
         else:
             print("No authority or choose an option from above")
 
@@ -216,11 +216,11 @@ def c_withdrawal(c_id):
             cur.execute(sql)
             print(f"\n Your current balance is :{account[5]}")
             print("\nRedirecting to customer controls...")
-            customerControls(c_id)
+            customer_controls(c_id)
 
         elif choice == 2:
             print("\nRedirecting to customer controls...")
-            customerControls(c_id)
+            customer_controls(c_id)
         else:
             print("No authority or choose an option from above")
           
