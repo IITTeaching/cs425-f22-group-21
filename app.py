@@ -128,7 +128,24 @@ def create_account():
 # Customers can only remove their own account
 # Don't know how this would really work though
 def delete_account():
-    pass
+    choice = 0
+    try:
+        del_acc = int(input("Enter account number to delete: "))
+        print("Delete {a}?")
+        print("1 - yes")
+        print("2 - no")
+        choice = int(input("Please choose an option to continue: "))
+        if choice == 1:
+            cur.execute("DELETE FROM Account WHERE account_num = {a}".format(a = del_acc))
+            print("deleted")
+            print("\nRedirecting to employee account managment...")
+            account_managment()
+        elif choice == 2:
+            print("\nRedirecting to employee account managment...")
+            account_managment()
+    except:
+        print("Account number does not exists try again")
+        delete_account()
 
 # Withdrawl, Deposit, Transfer, and External transfer
 # This can be accessed by managers, customers (for their own accounts), and tellers
@@ -144,11 +161,11 @@ def account_transaction():
         choice = int(input("\nPlease choose an option to continue: "))
 
         if choice == 1:
-            pass
+            e_Withdrawl()
         elif choice == 2:
-            pass
+            e_deposit()
         elif choice == 3:
-            pass
+            e_transfer
         elif choice == 4:
             pass
         elif choice == 5:
@@ -157,10 +174,91 @@ def account_transaction():
         else:
             print("Please choose an option from above")
 
+def e_Withdrawl():
+    choice = 0
+    print("Which account to withdraw money?")
+    try:
+        input_num = int(input("Enter account number: "))
+        cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_num))
+        acc = cur.fetchall()
+        input_amount = int(input("Enter amount of money to withdraw: "))
+        print("Withdraw {amount} from account number {ac_num}?".format(amount = input_amount, ac_num = input_num))
+        print("1 - yes")
+        print("2 - no")        
+        choice = int(input("Please choose an option to continue: "))
+
+        if choice == 1:
+            new_balance = acc[4] - input_amount
+            cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = input_num,b = new_balance))
+            print("{ac_num} has balance {amount}".format(amount = new_balance, ac_num = input_num))
+            print("\nRedirecting to employee account transaction...")
+            account_transaction()
+        elif choice == 2:
+            print("\nRedirecting to employee account transaction...")
+            account_transaction()   
+    except:
+        print("c_id does not exists or does not have enough moeny")
+
+def e_deposit():
+    choice = 0
+    print("Which account to deposit money?")
+    try:
+        input_num = int(input("Enter account number: "))
+        cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_num))
+        acc = cur.fetchall()
+        input_amount = int(input("Enter amount of money to deposit: "))
+        print("Deposit {amount} from account number {ac_num}?".format(amount = input_amount, ac_num = input_num))
+        print("1 - yes")
+        print("2 - no")        
+        choice = int(input("Please choose an option to continue: "))
+
+        if choice == 1:
+            new_balance = acc[4] + input_amount
+            cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = input_num,b = new_balance))
+            print("{ac_num} has balance {amount}".format(amount = new_balance, ac_num = input_num))
+            print("\nRedirecting to employee account transaction...")
+            account_transaction()
+        elif choice == 2:
+            print("\nRedirecting to employee account transaction...")
+            account_transaction()   
+    except:
+        print("c_id does not exists or does not have enough moeny")
+
+def e_transfer():
+    choice = 0
+    print("Which accounts to transfer money?")
+    try:
+        print("Enter account number: ")
+        input_from = int(input("transfer from: "))
+        input_to = int(input("transfer to: "))
+        cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_from))
+        acc_from = cur.fetchall()
+        cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_to))
+        acc_to = cur.fetchall()
+        input_amount = int(input("Enter amount of money to transfer: "))
+        print("transfer {amount} from account number {ac_num1} to account number {ac_num2}?".format(amount = input_amount, ac_num1 = input_from, ac_num2 = input_to))
+        print("1 - yes")
+        print("2 - no")        
+        choice = int(input("Please choose an option to continue: "))
+
+        if choice == 1:
+            nbalance_from = acc_from[4] - input_amount
+            nbalance_to = acc_to[4] + input_amount
+            cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = nbalance_from,b = acc_from))
+            cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = nbalance_to,b = acc_to))
+            print("{ac_num1} has balance {amount1}\n{ac_num2} has balance {amount2}".format(amount1 = nbalance_from, amount2 = nbalance_to, ac_num1 = acc_from, ac_num2 = acc_to))
+            print("\nRedirecting to employee account transaction...")
+            account_transaction()
+        elif choice == 2:
+            print("\nRedirecting to employee account transaction...")
+            account_transaction()   
+    except:
+        print("c_id does not exists or does not have enough moeny") 
+
 # Manage accounts
 # Managers only have access to this information
 # There should also be an account management page for customers seperate from this one
-  # Account Management page for customers include: create, delete, show statement, and pending transactions
+# Account Management page for customers include: create, delete, show statement, and pending transactions
 def account_managment():
     choice = 0
     while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5 and choice == 6):
