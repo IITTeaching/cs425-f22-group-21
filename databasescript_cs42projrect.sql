@@ -1,13 +1,15 @@
-DROP TABLE IF EXISTS Employee cascade;
-DROP TABLE IF EXISTS Branch cascade;
-DROP TABLE IF EXISTS Customer cascade;
-DROP TABLE IF EXISTS Transactions cascade;
-DROP TABLE IF EXISTS Account cascade;
-DROP TABLE IF EXISTS Loan cascade;
+
+DROP TABLE Transactions;
+DROP TABLE AccountType;
+DROP TABLE Account;
+DROP TABLE Customer;
+DROP TABLE Employee;
+DROP TABLE Branch;
+DROP TABLE Address;
 
 CREATE TABLE Address (
   address_id int PRIMARY KEY,
-  add text NOT NULL,
+  street_name text NOT NULL,
   city text NOT NULL,
   state text NOT NULL,
   zip char(5) NOT NULL
@@ -33,8 +35,8 @@ CREATE TABLE Employee (
 
 CREATE TABLE Customer (
   customer_id serial PRIMARY KEY,
-  customer_username varchar(15) NOT NULL,
-  customer_password varchar(15) UNIQUE NOT NULL,
+  customer_username varchar(10) NOT NULL,
+  customer_password varchar(12) UNIQUE NOT NULL,
   home_branch int REFERENCES Branch(branch_id),
   first_name text NOT NULL,
   last_name text NOT NULL,
@@ -44,8 +46,6 @@ CREATE TABLE Customer (
 CREATE TABLE Account (
    account_id int REFERENCES Customer(customer_id) ON DELETE CASCADE,
    account_num int PRIMARY KEY,
-   username varchar(10) UNIQUE NOT NULL,
-   password varchar(12) NOT NULL,
    balance int NOT NULL
 );
 
@@ -55,12 +55,12 @@ CREATE TABLE AccountType (
    allow_neg boolean DEFAULT FALSE,
    overdraft_fee int DEFAULT 0,
    monthly_fee int DEFAULT 0,
-   account_id int REFERENCES Account ON DELETE CASCADE,
+   account_id int REFERENCES Customer(customer_id) ON DELETE CASCADE,
    CONSTRAINT account_type_check CHECK (account_type IN ('Checkings', 'Savings'))
 );
 
-
 CREATE TABLE Transactions (
+   transaction_date date NOT NULL,
    description text,
    amount int NOT NULL,
    trans_type text NOT NULL,
