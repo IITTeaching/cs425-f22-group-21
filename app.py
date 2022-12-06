@@ -375,7 +375,7 @@ def e_create_account(e_id, f):
     e_account_management(e_id, f) # Brings back to Manager Account
     
 # Customer create customer account
-def c_create_account():
+def c_create_account(c_id):
     print("\nWelcome to Account Creation!\n")
 
     cust_id = new_cid()
@@ -406,7 +406,7 @@ def c_create_account():
 
     print(f"\nSuccessfully created an account for {first_name} {last_name}!\n")
     print("\nBringing you back to Account Management page...")
-    c_account_management() # Brings back to customer account
+    c_account_management(c_id) # Brings back to customer account
           
 # Manager customer Account Deletion
 def e_delete_account(e_id, f):
@@ -445,7 +445,7 @@ def e_delete_account(e_id, f):
         e_account_management(e_id, f)
           
 # Customer customer Account Deletion
-def c_delete_account():
+def c_delete_account(c_id):
     print("\nCustomer Account Deletion Page\n")
 
     acc_num = int(input("\nPlease enter your account number to continue: "))
@@ -478,7 +478,7 @@ def c_delete_account():
     except Exception as e:
         print(e, "Error occured while delete account.")
         print("Redirecting back to Account Management Page....")
-        c_account_management()
+        c_account_management(c_id)
         
 # Withdrawl, Deposit, Transfer, and External transfer - Employees
 def e_account_transaction(e_id, f):
@@ -529,7 +529,7 @@ def c_account_transaction(c_id):
             print("No authority or choose an option from above")
           
 # Customer account managemet
-def c_account_management(c_id, f):
+def c_account_management(c_id):
     print("\nCustomer Account Management Page\n")
 
     choice = 0
@@ -543,38 +543,38 @@ def c_account_management(c_id, f):
         choice = int(input("\nPlease choose an option to continue: "))
 
         if choice == 1:
-            c_create_account(c_id, f)
+            c_create_account(c_id)
         elif choice == 2:
-            c_delete_account(c_id, f)
+            c_delete_account(c_id)
         elif choice == 3:
-            c_show_statement(c_id, f)
+            c_show_statement(c_id)
         elif choice == 4:
-            c_show_pending_trans(c_id, f)
+            c_show_pending_trans(c_id)
         elif choice == 5:
-            customer_controls(c_id, f)
+            customer_controls(c_id)
         else:
             print("Invalid choice.")
 
 # Not sure what to do on pending transaction
-def c_show_pending_trans(c_id, f):
+def c_show_pending_trans(c_id):
     pass
 
 # Customer show statement
-def c_show_statement(c_id, f):
+def c_show_statement(c_id):
     input_mon = input("Enter specific month to see statement: ")
-    cur.execute("SELECT * FROM Transactions WHERE account_id = {} and month(trans_time) = {}".format(input_id, input_mon)
+    cur.execute("SELECT * FROM Transactions WHERE account_id = {} and month(trans_time) = {}".format(c_id, input_mon))
     statement = cur.fetchall()
     print(statement)
-    e_account_management(c_id, f)
+    c_account_management(c_id)
 
 # Employee show statement
-def e_show_statement(f):
+def e_show_statement(e_id, f):
     input_id = input("Enter account id to see statement: ")
     input_mon = input("Enter specific month to see statement: ")
-    cur.execute("SELECT * FROM Transactions WHERE account_id = {} and month(trans_time) = {}".format(input_id, input_mon)
+    cur.execute("SELECT * FROM Transactions WHERE account_id = {} and month(trans_time) = {}".format(input_id, input_mon))
     statement = cur.fetchall()
     print(statement)
-    e_account_management(f)
+    e_account_management(e_id, f)
 
 # Customer controls
 def customer_controls(c_id):
@@ -591,7 +591,7 @@ def customer_controls(c_id):
         if choice == 1:
             c_account_transaction(c_id)
         elif choice == 2:
-            c_account_management()
+            c_account_management(c_id)
         elif choice == 3:
             print("\nLogging you out...")
             exit(1)
@@ -617,11 +617,11 @@ def e_account_management(e_id, f):
         choice = int(input("\nPlease choose an option to continue: "))
 
         if choice == 1:
-            e_create_account(f)
+            e_create_account(e_id, f)
         elif choice == 2:
-            e_delete_account(f)
+            e_delete_account(e_id, f)
         elif choice == 3:
-            e_show_statement(f)
+            e_show_statement(e_id, f)
         elif choice == 4:
             pass
         elif choice == 5:
