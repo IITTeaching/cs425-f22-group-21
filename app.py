@@ -35,7 +35,7 @@ def account_transaction():
         elif choice == 2:
             e_deposit()
         elif choice == 3:
-            e_transfer
+            e_transfer()
         elif choice == 4:
             pass
         elif choice == 5:
