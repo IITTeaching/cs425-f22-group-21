@@ -62,11 +62,11 @@ def e_Withdrawl(e_id, f):
         print("2 - no")        
         choice = int(input("Please choose an option to continue: "))
 
-        if choice == 1 and acc[4] - input_amount >= 0:
-            new_balance = acc[4] - input_amount
+        if choice == 1 and acc[2] - input_amount >= 0:
+            new_balance = acc[2] - input_amount
             cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = input_num,b = new_balance))
             print("{ac_num} has balance {amount}".format(amount = new_balance, ac_num = input_num))
-            cur.execute("INSERT INTO Transaction VALUES ('By employee Withdraw {amount} from account number {ac_num}', {amount}, 'Withdrawl', {ac_num}, CURRENTCURRENT_TIMESTAMP);".format(amount = input_amount, ac_num = input_num))
+            cur.execute("INSERT INTO Transaction VALUES ('By employee Withdraw {amount} from account number {ac_num}', {amount}, 'Withdrawl', {ac_id}, CURRENTCURRENT_TIMESTAMP);".format(amount = input_amount, ac_id = acc[0], ac_num = input_num))
             print("\nRedirecting to employee account transaction...")
             e_account_transaction(e_id, f)
         elif choice == 2:
@@ -93,7 +93,7 @@ def e_deposit(e_id, f):
             new_balance = acc[4] + input_amount
             cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = input_num,b = new_balance))
             print("{ac_num} has balance {amount}".format(amount = new_balance, ac_num = input_num))
-            cur.execute("INSERT INTO Transaction VALUES ('By employee deposit {amount} from account number {ac_num}', {amount}, 'Deposit', {ac_num}, CURRENTCURRENT_TIMESTAMP);".format(amount = input_amount, ac_num = input_num))
+            cur.execute("INSERT INTO Transaction VALUES ('By employee deposit {amount} from account number {ac_num}', {amount}, 'Deposit', {ac_id}, CURRENTCURRENT_TIMESTAMP);".format(amount = input_amount, ac_num = input_num, ac_id = acc[0]))
             print("\nRedirecting to employee account transaction...")
             e_account_transaction(e_id, f)
         elif choice == 2:
@@ -126,7 +126,7 @@ def e_transfer(e_id, f):
             cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = nbalance_from,b = acc_from))
             cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = nbalance_to,b = acc_to))
             print("{ac_num1} has balance {amount1}\n{ac_num2} has balance {amount2}".format(amount1 = nbalance_from, amount2 = nbalance_to, ac_num1 = acc_from, ac_num2 = acc_to))
-            cur.execute("INSERT INTO Transaction VALUES ('By employee transfer {amount} from account number {ac_num1} to account number {ac_num2}', {amount}, 'Transfer', {ac_num1}, CURRENTCURRENT_TIMESTAMP);".format(amount = input_amount, ac_num1 = input_from, ac_num2 = input_to))
+            cur.execute("INSERT INTO Transaction VALUES ('By employee transfer {amount} from account number {ac_num1} to account number {ac_num2}', {amount}, 'Transfer', {ac_id}, CURRENTCURRENT_TIMESTAMP);".format(amount = input_amount, ac_num1 = input_from, ac_num2 = input_to, ac_id = acc_from[0]))
             print("\nRedirecting to employee account transaction...")
             e_account_transaction(e_id, f)
         elif choice == 2:
@@ -152,14 +152,16 @@ def c_transfer (c_id):
         print("2 - no")
         choice = int(input("\nPlease choose an option to continue: "))
 
-        if choice == 1:
+        if choice == 1 and my_account[4] - amount >= 0:
             my_new_balance = my_account[4] - amount
             other_new_balance = other_account[4] + amount
             sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(my_new_balance, my_account)
             cur.execute(sql)
             sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(other_new_balance, other_account)
             cur.execute(sql)
-
+            cur.execute("SELECT customer_username FROM Customer WHERE '{}'=customer_id".format(c_id))
+            user_name = cur.fetchone()
+            cur.execute("INSERT INTO Transaction VALUES ('By {user1} transfer {amount} from account number {ac_num1} to account number {ac_num2}', {amount}, 'Transfer', {ac_id}, CURRENTCURRENT_TIMESTAMP);".format(user1 = user_name, amount = amount, ac_num1 = my_account[1], ac_num2 = other_account[1], ac_id = c_id))
             print(f"\n Your current balance is :{my_new_balance[5]}")
             print("\nRedirecting to customer controls...")
             customer_controls(c_id)
@@ -175,7 +177,7 @@ def c_deposit (c_id):
     amount = int(input("\nHow much would you like to deposit to your account?"))
     cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(c_id))
     account = cur.fetchone()
-    print("\n depositing " + amount + " to your current balance of " + account[4])
+    print("\n depositing " + amount + " to your current balance of " + account[2])
     choice = 0
     while not (choice == 1 and choice == 2):
         print('\n Please, confirm the transaction:')
@@ -184,10 +186,13 @@ def c_deposit (c_id):
         choice = int(input("\nPlease choose an option to continue: "))
 
         if choice == 1:
-            new_balance = account[4] + amount
+            new_balance = account[2] + amount
             sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(new_balance, c_id)
             cur.execute(sql)
-            print(f"\n Your current balance is :{account[5]}")
+            cur.execute("SELECT customer_username FROM Customer WHERE '{}'=customer_id".format(c_id))
+            user_name = cur.fetchone()
+            cur.execute("INSERT INTO Transaction VALUES ('By {user} deposit {amount} from account number {ac_num}', {amount}, 'Deposit', {ac_id}, CURRENTCURRENT_TIMESTAMP);".format(user = user_name, amount = amount, ac_num = account[1], ac_id = c_id))
+            print(f"\n Your current balance is :{account[2]}")
             print("\nRedirecting to customer controls...")
             customer_controls(c_id)
 
@@ -202,7 +207,7 @@ def c_withdrawal(c_id):
     amount = int(input("\nHow much would you like to withdraw from your account?"))
     cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(c_id))
     account = cur.fetchone()
-    print("\n withdrawing " + amount + " to your current balance of " + account[4])
+    print("\n withdrawing " + amount + " to your current balance of " + account[2])
     choice = 0
     while not (choice == 1 and choice == 2):
         print('\n Please, confirm the transaction:')
@@ -210,11 +215,14 @@ def c_withdrawal(c_id):
         print("2 - no")
         choice = int(input("\nPlease choose an option to continue: "))
 
-        if choice == 1:
-            new_balance = account[4] - amount
+        if choice == 1 and account[2] - amount >= 0:
+            new_balance = account[2] - amount
             sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(new_balance, c_id)
             cur.execute(sql)
-            print(f"\n Your current balance is :{account[5]}")
+            cur.execute("SELECT customer_username FROM Customer WHERE '{}'=customer_id".format(c_id))
+            user_name = cur.fetchone()
+            cur.execute("INSERT INTO Transaction VALUES ('By {user} Withdraw {amount} from account number {ac_num}', {amount}, 'Withdrawl', {ac_id}, CURRENTCURRENT_TIMESTAMP);".format(user = user_name, amount = amount, ac_num = account[1], ac_id = c_id))
+            print(f"\n Your current balance is :{account[2]}")
             print("\nRedirecting to customer controls...")
             customer_controls(c_id)
 
