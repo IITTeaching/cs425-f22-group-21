@@ -1,9 +1,9 @@
 import psycopg2
 
 connection = {
- "dbname": "postgres",
+ "dbname": "example",
  "user": "postgres",
- "password": "qwer1234",
+ "password": "test",
  "port": 5432
 }
 
@@ -375,7 +375,7 @@ def e_create_account(e_id, f):
     e_account_management(e_id, f) # Brings back to Manager Account
     
 # Customer create customer account
-def c_create_account(c_id):
+def c_create_account():
     print("\nWelcome to Account Creation!\n")
 
     cust_id = new_cid()
@@ -406,7 +406,7 @@ def c_create_account(c_id):
 
     print(f"\nSuccessfully created an account for {first_name} {last_name}!\n")
     print("\nBringing you back to Account Management page...")
-    c_account_management(c_id) # Brings back to customer account
+    c_account_management() # Brings back to customer account
           
 # Manager customer Account Deletion
 def e_delete_account(e_id, f):
