@@ -71,9 +71,11 @@ def e_Withdrawl(e_id, f):
             cur.execute("INSERT INTO Transaction VALUES ('By employee Withdraw {amount} from account number {ac_num}', {amount}, 'Withdrawl', {ac_id}, CURRENT_TIMESTAMP);".format(amount = input_amount, ac_id = acc[0], ac_num = input_num))
             print("\nRedirecting to employee account transaction...")
             e_account_transaction(e_id, f)
+            
         elif choice == 2:
             print("\nRedirecting to employee account transaction...")
             e_account_transaction(e_id, f)   
+           
     except:
         print("c_id does not exists or does not have enough moeny")
 
@@ -333,7 +335,7 @@ def e_create_account(e_id, f):
     if worked:
         pass # leave as is
     else:
-        e_account_management(f)
+        e_account_management(e_id, f)
 
     first_name = input("Enter first name: ")
     last_name = input("Enter last name: ")
@@ -357,7 +359,7 @@ def e_create_account(e_id, f):
     e_account_management(e_id, f) # Brings back to Manager Account
     
 # Customer create customer account
-def c_create_account():
+def c_create_account(c_id):
     print("\nWelcome to Account Creation!\n")
 
     cust_id = new_cid()
@@ -367,7 +369,7 @@ def c_create_account():
     if worked:
         pass # leave as is
     else:
-        c_account_management()
+        c_account_management(c_id)
 
     first_name = input("Enter first name: ")
     last_name = input("Enter last name: ")
@@ -388,7 +390,7 @@ def c_create_account():
 
     print(f"\nSuccessfully created an account for {first_name} {last_name}!\n")
     print("\nBringing you back to Account Management page...")
-    c_account_management() # Brings back to customer account
+    c_account_management(c_id) # Brings back to customer account
           
 # Manager customer Account Deletion
 def e_delete_account(e_id, f):
@@ -627,13 +629,135 @@ def add_fees(e_id, f):
         choice = int(input("Make a selection of what fee you would like to change: "))
 
         if choice == 1:
-            pass
+            account_id = int(input("Enter customer account ID to continue: "))
+
+            cur.execute(f"SELECT account_id, interest_rate, account_type FROM AccountType WHERE account_id = {account_id};")
+            accounts = cur.fetchall()
+
+            print(f"Account ID: {accounts[0]}\Interest fees: {accounts[1]}\nAccount Type: {accounts[2]}\n")
+
+            try:
+                choice = input("Do you want to add an interest fee? (y/n): ")
+
+                if choice.lower() == 'y':
+                    interest = int(input("Enter an interest fee to be applied to account: "))
+
+                    cur.execute(f"UPDATE AccountType SET interest_rate = {interest} WHERE account_id = {account_id};")
+                    conn.commit()
+
+                    print("\nSuccessfully completed requested.\n")
+
+                else:
+                    print("\nThere is now no interest fee for this account.")
+                    print("Completed request.\n")
+
+                user_input = 0
+                while not(user_input == 1):
+                    user_input = int(input("\nPlease enter 1 to return back to main scree."))
+
+                e_account_management(e_id, f)
+
+            except Exception as e:
+                print("Error occured while trying to change account settings.\n", e)
+                e_account_management(e_id, f)
+
         elif choice == 2:
-            pass
+            account_id = int(input("Enter customer account ID to continue: "))
+
+            cur.execute(f"SELECT account_id, overdraft_fee, account_type FROM AccountType WHERE account_id = {account_id};")
+            accounts = cur.fetchall()
+
+            print(f"Account ID: {accounts[0]}\nOverdraft fees: {accounts[1]}\nAccount Type: {accounts[2]}\n")
+
+            try:
+                choice = input("Do you want to add an overdraft fee? (y/n): ")
+
+                if choice.lower() == 'y':
+                    over_fee = int(input("Enter an overdraft fee to be applied to account: "))
+
+                    cur.execute(f"UPDATE AccountType SET overdraft_fee = {over_fee} WHERE account_id = {account_id};")
+                    conn.commit()
+
+                    print("\nSuccessfully completed requested.\n")
+
+                else:
+                    print("\nThere is now no overdraft fee for this account.")
+                    print("Completed request.\n")
+
+                user_input = 0
+                while not(user_input == 1):
+                    user_input = int(input("\nPlease enter 1 to return back to main scree."))
+
+                e_account_management(e_id, f)
+
+            except Exception as e:
+                print("Error occured while trying to change account settings.\n", e)
+                e_account_management(e_id, f)
+
         elif choice == 3:
-            pass
+            account_id = int(input("Enter customer account ID to continue: "))
+
+            cur.execute(f"SELECT account_id, monthly_fee, account_type FROM AccountType WHERE account_id = {account_id};")
+            accounts = cur.fetchall()
+
+            print(f"Account ID: {accounts[0]}\Monthly fees: {accounts[1]}\nAccount Type: {accounts[2]}\n")
+
+            try:
+                choice = input("Do you want to add an monthly fee? (y/n): ")
+
+                if choice.lower() == 'y':
+                    monthly = int(input("Enter an monthly fee to be applied to account: "))
+
+                    cur.execute(f"UPDATE AccountType SET overdraft_fee = {monthly} WHERE account_id = {account_id};")
+                    conn.commit()
+
+                    print("\nSuccessfully completed requested.\n")
+
+                else:
+                    print("\nThere is now no monthly fee for this account.")
+                    print("Completed request.\n")
+
+                user_input = 0
+                while not(user_input == 1):
+                    user_input = int(input("\nPlease enter 1 to return back to main scree."))
+
+                e_account_management(e_id, f)
+
+            except Exception as e:
+                print("Error occured while trying to change account settings.\n", e)
+                e_account_management(e_id, f)
+
         elif choice == 4:
-            pass
+            account_id = int(input("Enter customer account ID to continue: "))
+
+            cur.execute(f"SELECT account_id, allow_neg, account_type FROM AccountType WHERE account_id = {account_id};")
+            accounts = cur.fetchall()
+
+            print(f"Account ID: {accounts[0]}\nNegative Balanced Allowed?: {accounts[1]}\nAccount Type: {accounts[2]}\n")
+
+            try:
+                choice = input("Do you want to allow negative balance? (y/n): ")
+
+                if choice.lower() == 'y':
+                    cur.execute(f"UPDATE AccountType SET allow_neg = 'TRUE' WHERE account_id = {account_id};")
+                    conn.commit()
+
+                    print("\nSuccessfully completed request.")
+
+                else:
+                    print("\nAccount allows a negative balance.")
+                    print("Completed request.\n")
+
+                user_input = 0
+                while not(user_input == 1):
+                    user_input = int(input("\nPlease enter 1 to return back to main screen: "))
+
+                e_account_management(e_id, f)
+
+            except Exception as e:
+                print("Error occured while trying to change account settings.\n", e)
+                e_account_management(e_id, f)
+
         elif choice == 5:
             print("Returning back to main page...")
             e_account_management(e_id, f)
