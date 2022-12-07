@@ -509,7 +509,7 @@ def c_pending_trans(c_id):
     
 # Employee Pending Transactions
 def e_pending_trans(e_id, f):
-    c_id = int(input("Enter customer ID to continue: ))
+    c_id = int(input("Enter customer ID to continue: "))
                      
     print() # spacing
  
