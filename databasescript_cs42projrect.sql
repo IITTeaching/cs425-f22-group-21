@@ -51,7 +51,7 @@ CREATE TABLE Account (
 );
 
 CREATE TABLE AccountType (
-   account_type text,
+   account_type text NOT NUL,
    interest_rate int DEFAULT 0,
    allow_neg boolean DEFAULT FALSE,
    overdraft_fee int DEFAULT 0,
@@ -62,6 +62,7 @@ CREATE TABLE AccountType (
 
 CREATE TABLE Transactions (
    description text,
+   pending boolean DEFAULT TRUE,
    amount int NOT NULL,
    trans_type text NOT NULL,
    account_id int REFERENCES Account,
