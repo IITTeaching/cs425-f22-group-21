@@ -64,7 +64,8 @@ CREATE TABLE Transactions (
    amount int NOT NULL,
    trans_type text NOT NULL,
    account_id int REFERENCES Account,
-   transaction_date timestamp NOT NULL
+   transaction_date timestamp NOT NULL,
+   pending boolean DEFAULT TRUE,
    CONSTRAINT transaction_type_check CHECK (trans_type IN ('Deposit', 'Withdrawal', 'Transfer', 'External Transfer'))
 );
 
