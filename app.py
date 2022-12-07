@@ -490,6 +490,42 @@ def c_delete_account(c_id):
         print("Redirecting back to Account Management Page....\n")
         c_account_management(c_id)
         pass
+       
+# Customer Pending Transactions
+def c_pending_trans(c_id):
+    cur.execute(f"SELECT account_id, transaction_date, pending, amount, trans_type FROM Transactions WHERE account_id = {c_id} and pending = 'TRUE';")
+    trans = cur.fetchall()
+
+    print("Account ID:\tTransaction Date:\t Transaction Type:\t Amount\t\t Pending?")
+
+    for rows in trans:
+        print(f"{rows[0]}\t\t{rows[1]}\t\t {rows[4]}\t\t {rows[3]}\t\t {rows[2]}")
+
+    choice = 0
+    while not(choice == 1):
+        choice = int(input("\nPlease enter 1 to return back to main screen: "))
+    
+    c_account_management(c_id)
+    
+# Employee Pending Transactions
+def e_pending_trans(e_id, f):
+    c_id = int(input("Enter customer ID to continue: ))
+                     
+    print() # spacing
+ 
+    cur.execute(f"SELECT account_id, transaction_date, pending, amount, trans_type FROM Transactions WHERE account_id = {c_id} and pending = 'TRUE';")
+    trans = cur.fetchall()
+
+    print("Account ID:\tTransaction Date:\t Transaction Type:\t Amount\t\t Pending?")
+
+    for rows in trans:
+        print(f"{rows[0]}\t\t{rows[1]}\t\t {rows[4]}\t\t {rows[3]}\t\t {rows[2]}")
+
+    choice = 0
+    while not(choice == 1):
+        choice = int(input("\nPlease enter 1 to return back to main screen: "))
+    
+    e_account_management(e_id, f)
  
 # Withdrawl, Deposit, Transfer, and External transfer - Employees
 def e_account_transaction(e_id, f):
@@ -619,15 +655,11 @@ def c_account_management(c_id):
         elif choice == 3:
             c_show_statement(c_id)
         elif choice == 4:
-            c_show_pending_trans(c_id)
+            c_pending_trans(c_id)
         elif choice == 5:
             customer_controls(c_id)
         else:
             print("Invalid choice.")
-
-# Not sure what to do on pending transaction
-def c_show_pending_trans(c_id):
-    pass
 
 # Customer show statement
 def c_show_statement(c_id):
@@ -723,7 +755,7 @@ def e_account_management(e_id, f):
         elif choice == 3:
             e_show_statement(e_id, f)
         elif choice == 4:
-            pass
+            e_pending_trans(e_id, f)
         elif choice == 5:
             add_fees(e_id, f)
         elif choice == 6:
