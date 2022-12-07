@@ -528,6 +528,65 @@ def c_account_transaction(c_id):
         else:
             print("No authority or choose an option from above")
           
+# Adding fees to an account
+def add_fees(e_id, f):
+    print("\nAdd interest, overdraft fees, or Account fees for an account\n")
+    print("Customer information is required to continue")
+
+    acc_num = int(input("Enter the customer's account number: "))
+
+    print(f"Fetching all information related to Account #{acc_num}")
+
+    sql = f"SELECT account_id, account_type, account_num FROM AccountType LEFT JOIN Account ON AccountType.account_id = Account.account_id WHERE account_num = {acc_num};"
+    acc = cur.execute(sql)
+
+    acc_ids = []
+
+    print("") # spacing
+
+    print("Account ID:\tAccount Type:\tAccount Number")
+
+    for rows in acc:
+        acc_ids.append(int(rows[0]))
+        print(f"{rows[0]}\t{rows[1]}\t{rows[2]}")
+
+    choice = 0
+    while choice not in acc_ids:
+        choice = int(input("Please select an account by inputting the Account ID: "))
+
+    print("\nNow fetching fee information related to account...\n")
+
+    sql = f"SELECT * from AccountType WHERE account_id = '{choice}';"
+    c_acc = cur.execute(sql)
+
+    print("Account ID:\tAccount Type:\tInterest Rate:\tOverdraft Fee:\tMonthly Fees:\tAllow negative balance?:")
+
+    for rows in c_acc:
+        print(f"{rows[5]}\t{rows[0]}\t{rows[1]}\t{rows[3]}\t{rows[4]}\t{rows[2]}")
+
+    choice = 0
+    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4):
+        print("1 - Interest Rate")
+        print("2 - Overdraft Fee")
+        print("3 - Monthly Fees")
+        print("4 - Allow negative balance?")
+        print("5 - Return back to main screen")
+        choice = int(input("Make a selection of what fee you would like to change: "))
+
+        if choice == 1:
+            pass
+        elif choice == 2:
+            pass
+        elif choice == 3:
+            pass
+        elif choice == 4:
+            pass
+        elif choice == 5:
+            print("Returning back to main page...")
+            e_account_management(e_id, f)
+        else:
+            print("Invalid choice. Try again.")
+          
 # Customer account managemet
 def c_account_management(c_id):
     print("\nCustomer Account Management Page\n")
@@ -625,7 +684,7 @@ def e_account_management(e_id, f):
         elif choice == 4:
             pass
         elif choice == 5:
-            pass
+            add_fees(e_id, f)
         elif choice == 6:
             print("\nLogging you out...")
             exit(1)
