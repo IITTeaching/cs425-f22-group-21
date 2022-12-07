@@ -1,11 +1,12 @@
+DROP TABLE IF EXISTS Transactions CASCADE;
+DROP TABLE IF EXISTS AccountType CASCADE;
+DROP TABLE IF EXISTS Account CASCADE;
+DROP TABLE IF EXISTS Customer CASCADE;
+DROP TABLE IF EXISTS Employee CASCADE;
+DROP TABLE IF EXISTS Branch CASCADE;
+DROP TABLE IF EXISTS Address CASCADE;
+DROP TABLE IF EXISTS Loan CASCADE;
 
-DROP TABLE Transactions;
-DROP TABLE AccountType;
-DROP TABLE Account;
-DROP TABLE Customer;
-DROP TABLE Employee;
-DROP TABLE Branch;
-DROP TABLE Address;
 
 CREATE TABLE Address (
   address_id int PRIMARY KEY,
@@ -29,7 +30,7 @@ CREATE TABLE Employee (
   salary numeric NOT NULL,
   emp_role text NOT NULL,
   lives_at int REFERENCES Address(address_id),
-  works_at int REFERENCES Branch(branch_id),
+  works_at int,
   CONSTRAINT emp_role_check CHECK (emp_role IN ('Manager', 'Bank Teller', 'Loan Specialist'))
  );
 
@@ -50,12 +51,12 @@ CREATE TABLE Account (
 );
 
 CREATE TABLE AccountType (
-   account_type text PRIMARY KEY,
+   account_type text,
    interest_rate int DEFAULT 0,
    allow_neg boolean DEFAULT FALSE,
    overdraft_fee int DEFAULT 0,
    monthly_fee int DEFAULT 0,
-   account_id int REFERENCES Customer(customer_id) ON DELETE CASCADE,
+   account_id int REFERENCES Customer(customer_id) ON DELETE CASCADE PRIMARY KEY,
    CONSTRAINT account_type_check CHECK (account_type IN ('Checkings', 'Savings'))
 );
 
@@ -64,7 +65,7 @@ CREATE TABLE Transactions (
    amount int NOT NULL,
    trans_type text NOT NULL,
    account_id int REFERENCES Account,
-   transaction_date timestamp NOT NULL
+   transaction_date DATE NOT NULL
    CONSTRAINT transaction_type_check CHECK (trans_type IN ('Deposit', 'Withdrawal', 'Transfer', 'External Transfer'))
 );
 
