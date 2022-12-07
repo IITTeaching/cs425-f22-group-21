@@ -1,4 +1,6 @@
 import psycopg2
+#import random
+#import string
 
 connection = {
  "dbname": "example",
@@ -177,7 +179,7 @@ def c_deposit (c_id):
     amount = int(input("\nHow much would you like to deposit to your account?"))
     cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(c_id))
     account = cur.fetchone()
-    print("\n depositing " + amount + " to your current balance of " + account[2])
+    print("\n depositing ", amount, " to your current balance of ", account[2])
     choice = 0
     while not (choice == 1 and choice == 2):
         print('\n Please, confirm the transaction:')
@@ -207,7 +209,7 @@ def c_withdrawal(c_id):
     amount = int(input("\nHow much would you like to withdraw from your account?"))
     cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(c_id))
     account = cur.fetchone()
-    print("\n withdrawing " + amount + " to your current balance of " + account[2])
+    print("\n withdrawing ", amount, " to your current balance of ", account[2])
     choice = 0
     while not (choice == 1 and choice == 2):
         print('\n Please, confirm the transaction:')
@@ -539,11 +541,13 @@ def e_account_transaction(e_id, f):
         print("5 - Go back")
         choice = int(input("\nPlease choose an option to continue: "))
 
-        if choice == 1:
+        cur.execute(f"SELECT account_type FROM AccountType WHERE account_id = '{c_id}'")
+        acc_type = cur.fetchone()[0]
+        if choice == 1 and acc_type == 'Checkings':
             e_Withdrawl(e_id, f)
         elif choice == 2:
             e_deposit(e_id, f)
-        elif choice == 3:
+        elif choice == 3 and acc_type == 'Checkings':
             e_transfer(e_id, f)
         elif choice == 4:
             e_external_transfer(e_id, f)
@@ -563,11 +567,13 @@ def c_account_transaction(c_id):
         print("4 - Exit")
         choice = int(input("\nPlease choose an option to continue: "))
 
-        if choice == 1:
+        cur.execute(f"SELECT account_type FROM AccountType WHERE account_id = '{c_id}'")
+        acc_type = cur.fetchone()[0]
+        if choice == 1 and acc_type == 'Checkings':
             c_withdrawal(c_id)
         elif choice == 2:
             c_deposit(c_id)
-        elif choice == 3:
+        elif choice == 3 and acc_type == 'Checkings':
             c_transfer(c_id)
         elif userInput == 4:
             print("\nRedirecting to customer controls...")
