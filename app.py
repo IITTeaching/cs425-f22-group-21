@@ -287,12 +287,10 @@ def new_cid():
     return all_ids[0] + 1
           
 # Choose an account type for account creation
-# IDK WHAT IM DOING
-# HOPEFULLY THE LOGIC MAKES SENSE
 def account_type(c_id):
     choice = 0
     account_num = ''.join(random.choice(string.digits) for _ in range(10))
-    balance = c_deposit(c_id)
+    balance = deposit(c_id)
 
     while not(choice == 1 and choice == 2):
         print("\nChoose an account type:")
@@ -302,42 +300,24 @@ def account_type(c_id):
 
         if choice == 1:
             try:
-                cur.execute(f"SELECT account_id, account_type FROM AccountType WHERE account_id = {c_id};")
-                found = cur.fetchall()
-
-                # Checks if they have a checkings account already
-                if (found[0] == c_id and found[1] == 'Checkings'):
-                    print("You already have a checkings account.")
-                    return False
-
-                else:
-                    cur.execute(f"INSERT INTO Account VALUES ({c_id}, {account_num}, {balance});")
-                    cur.execute(f"INSERT INTO AccountType VALUES ('Checkings', {0}, 'FALSE', {0}, {0}, {c_id});")
-                    conn.commit()
-                    return True
+                cur.execute(f"INSERT INTO Account VALUES ({c_id}, {account_num}, {balance});")
+                cur.execute(f"INSERT INTO AccountType VALUES ('Checkings', {0}, 'FALSE', {0}, {0}, {c_id});")
+                conn.commit()
+                return True
 
             except Exception as e:
-                print(e)
+                print("Error occured while creating 'Checkings' account\n", e)
                 return False
 
         elif choice == 2:
             try:
-                cur.execute(f"SELECT account_id, account_type FROM AccountType WHERE account_id = {c_id};")
-                found = cur.fetchall()
-
-                # Checks if they have a savings account already
-                if found[0] == c_id and found[1] == 'Savings':
-                    print("You already have a savings account.")
-                    return False
-                
-                else:
-                    cur.execute(f"INSERT INTO Account VALUES ({c_id}, {account_num}, {balance});")
-                    cur.execute(f"INSERT INTO AccountType VALUES ('Savings', {0}, 'FALSE', {0}, {0}, {c_id});")
-                    conn.commit()
-                    return True
+                cur.execute(f"INSERT INTO Account VALUES ({c_id}, {account_num}, {balance});")
+                cur.execute(f"INSERT INTO AccountType VALUES ('Savings', {0}, 'FALSE', {0}, {0}, {c_id});")
+                conn.commit()
+                return True
 
             except Exception as e:
-                print(e)
+                print("Error occured while creating 'Savings' account\n", e)
                 return False
           
 # Manager create customer account
@@ -414,6 +394,8 @@ def e_delete_account(e_id, f):
 
     acc_num = int(input("\nPlease enter your account number to continue: "))
 
+    print("\nPlease make sure you withdraw or transfer any reamaing funds in the account before proceeding\n")
+
     sql = f"SELECT a.account_id, a.account_num, t.account_type FROM customer c LEFT JOIN account a ON c.customer_id = a.account_id LEFT JOIN accounttype t ON a.account_id = t.account_id WHERE a.account_num = {acc_num};"
 
     cur.execute(sql)
@@ -427,22 +409,36 @@ def e_delete_account(e_id, f):
 
     choice = 0
     while choice not in acc_ids1:
-        choice = int(input("Please choose which account you want to delete: "))
+        choice = int(input("Please choose which account you want to delete by inputting the ID: "))
+
+    cur.execute(f"SELECT balance FROM Account where account_id = {choice};")
+    balance = cur.fetchone()
+
+    if balance[0] == 0:
+        pass
+    else:
+        print("\nPlease remove any reamining funds in account.")
+        print("Returning back to main screen...\n")
+        e_account_management(e_id, f)
+        pass
 
     # Executes the deletion
     try:
         cur.execute(f"DELETE FROM Account WHERE account_id = {choice};")
         cur.execute(f"DELETE FROM AccountType WHERE account_id = {choice};")
-        conn.commit()
+        conn.commit(f)
 
-        print("Successfully deleteed account.")
-        print("Redirecting back to Account Management Page....")
+        print("\nSuccessfully deleted account.")
+        print("Redirecting back to Account Management Page....\n")
         e_account_management(e_id, f)
+        pass
 
     except Exception as e:
-        print(e, "Error occured while delete account.")
-        print("Redirecting back to Account Management Page....")
+        print("\nError occured while trying to delete account\n", e)
+        print("Redirecting back to Account Management Page....\n")
         e_account_management(e_id, f)
+        pass
+        
           
 # Customer customer Account Deletion
 def c_delete_account(c_id):
@@ -450,20 +446,33 @@ def c_delete_account(c_id):
 
     acc_num = int(input("\nPlease enter your account number to continue: "))
 
+    print("\nPlease make sure you withdraw or transfer any reamaing funds in the account before proceeding\n")
+
     sql = f"SELECT a.account_id, a.account_num, t.account_type FROM customer c LEFT JOIN account a ON c.customer_id = a.account_id LEFT JOIN accounttype t ON a.account_id = t.account_id WHERE a.account_num = {acc_num};"
 
     cur.execute(sql)
     accounts = cur.fetchall()
 
-    acc_ids2 = []
+    acc_ids1 = []
 
     for rows in accounts:
-        acc_ids2.append(int(rows[0]))
+        acc_ids1.append(int(rows[0]))
         print(f"{rows[0]} - Account #{rows[1]} & Account Type: {rows[2]}")
 
     choice = 0
-    while choice not in acc_ids2:
-        choice = int(input("Please choose which account you want to delete: "))
+    while choice not in acc_ids1:
+        choice = int(input("Please choose which account you want to delete by inputting the ID: "))
+
+    cur.execute(f"SELECT balance FROM Account where account_id = {choice};")
+    balance = cur.fetchone()
+
+    if balance[0] == 0:
+        pass
+    else:
+        print("\nPlease remove any reamining funds in account.")
+        print("Returning back to main screen...\n")
+        c_account_management(c_id)
+        pass
 
     # Executes the deletion
     try:
@@ -471,15 +480,17 @@ def c_delete_account(c_id):
         cur.execute(f"DELETE FROM AccountType WHERE account_id = {choice};")
         conn.commit()
 
-        print("Successfully deleteed account.")
-        print("Redirecting back to Account Management Page....")
-        c_account_management()
+        print("\nSuccessfully deleted account.")
+        print("Redirecting back to Account Management Page....\n")
+        c_account_management(c_id)
+        pass
 
     except Exception as e:
-        print(e, "Error occured while delete account.")
-        print("Redirecting back to Account Management Page....")
+        print("\nError occured while trying to delete account\n", e)
+        print("Redirecting back to Account Management Page....\n")
         c_account_management(c_id)
-        
+        pass
+ 
 # Withdrawl, Deposit, Transfer, and External transfer - Employees
 def e_account_transaction(e_id, f):
     choice = 0
@@ -620,19 +631,49 @@ def c_show_pending_trans(c_id):
 
 # Customer show statement
 def c_show_statement(c_id):
-    input_mon = input("Enter specific month to see statement: ")
-    cur.execute("SELECT * FROM Transactions WHERE date_part('month', transaction_date) = {}".format(c_id, input_mon))
+    print("\nShow statements for an account\n")
+
+    year = input("Enter a year: ")
+    month = input("Enter a month (from 1-12): ")
+
+    print() # spacing
+
+    cur.execute(f"select * from transactions where extract(year from transaction_date) = '{year}' and extract(month from transaction_date) = '{month}' and account_id={c_id};")
     statement = cur.fetchall()
-    print(statement)
+
+    print("Account ID:\t Date:\t\tDescription:\t Amount:\t Transaction Type:\t Pending?:")
+
+    for rows in statement:
+        print(f"{rows[5]}\t\t {rows[0]}\t{rows[2]}\t\t {rows[3]}\t\t {rows[4]}\t\t {rows[1]}")
+
+    choice = 0
+    while not(choice == 1):
+        choice = int(input("\nPlease enter 1 to return back to main screen: "))
+    
     c_account_management(c_id)
 
 # Employee show statement
 def e_show_statement(e_id, f):
-    input_id = input("Enter account id to see statement: ")
-    input_mon = input("Enter specific month to see statement: ")
-    cur.execute("SELECT * FROM (SELECT * FROM Transactions WHERE date_part('month', transaction_date) = {}) l WHERE account_id = {}".format(input_mon, input_id, input_mon))
+    print("\nShow statements for an account\n")
+  
+    c_id = int(input("Enter customer ID: "))
+    year = input("Enter a year: ")
+    month = input("Enter a month (from 1-12): ")
+
+    print() # spacing
+
+    cur.execute(f"select * from transactions where extract(year from transaction_date) = '{year}' and extract(month from transaction_date) = '{month}' and account_id={c_id};")
     statement = cur.fetchall()
-    print(statement)
+
+    print("Account ID:\t Date:\t\tDescription:\t Amount:\t Transaction Type:\t Pending?:")
+
+    for rows in statement:
+        print(f"{rows[5]}\t\t {rows[0]}\t{rows[2]}\t\t {rows[3]}\t\t {rows[4]}\t\t {rows[1]}")
+
+    choice = 0
+    while not(choice == 1):
+        choice = int(input("\nPlease enter 1 to return back to main screen: "))
+    
     e_account_management(e_id, f)
 
 # Customer controls
