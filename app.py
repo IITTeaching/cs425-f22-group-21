@@ -290,7 +290,7 @@ def new_cid():
 def account_type(c_id):
     choice = 0
     account_num = ''.join(random.choice(string.digits) for _ in range(10))
-    balance = deposit(c_id)
+    balance = 0
 
     while not(choice == 1 and choice == 2):
         print("\nChoose an account type:")
