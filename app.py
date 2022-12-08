@@ -20,38 +20,12 @@ except:
 # Create a cursor
 cur = conn.cursor()
 
-# Withdrawl, Deposit, Transfer, and External transfer
-# This can be accessed by managers, customers (for their own accounts), and tellers
-#def e_account_transaction(e_id, f):
-#    choice = 0
-#    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
-#        print("\nPlease, select an option from below:")
-#        print("1 - Withdrawl")
-#        print("2 - Deposit")
-#        print("3 - Transfer")
-#        print("4 - External transfer")
-#        print("5 - Go back")
-#        choice = int(input("\nPlease choose an option to continue: "))
-#
-#        if choice == 1:
-#            e_Withdrawl(e_id, f)
-#        elif choice == 2:
-#            e_deposit(e_id, f)
-#        elif choice == 3:
-#            e_transfer(e_id, f)
-#        elif choice == 4:
-#            e_external_transfer(e_id, f)
-#        elif choice == 5:
-#            employee_controls(e_id, f)
-#        else:
-#            print("Please choose an option from above")
-
 # Not sure what to do
 def e_external_transfer():
     pass
 
-# Employee withdrawl
-def e_Withdrawl(e_id, f):
+# Employee withdrawal
+def e_Withdrawal(e_id, f):
     choice = 0
     print("Which account to withdraw money?")
     try:
@@ -75,7 +49,7 @@ def e_Withdrawl(e_id, f):
             new_balance = acc[2] - input_amount
             cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = input_num,b = new_balance))
             print("{ac_num} has balance {amount}".format(amount = new_balance, ac_num = input_num))
-            cur.execute(f"INSERT INTO Transactions VALUES ('By employee Withdraw {input_amount} from account number {input_num}', {input_amount}, 'Withdrawl', {acc[0]}, CURRENT_TIMESTAMP);")
+            cur.execute(f"INSERT INTO Transactions VALUES ('By employee Withdraw {input_amount} from account number {input_num}', {input_amount}, 'Withdrawal', {acc[0]}, CURRENT_TIMESTAMP);")
             print("\nRedirecting to employee account transaction...")
             e_account_transaction(e_id, f)
             
@@ -212,7 +186,7 @@ def c_deposit (c_id):
         else:
             print("No authority or choose an option from above")
 
-# Customer withdrawl       
+# Customer withdrawal       
 def c_withdrawal(c_id):
     amount = int(input("\nHow much would you like to withdraw from your account?"))
     cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(c_id))
@@ -526,7 +500,7 @@ def c_pending_trans(c_id):
     print("Account ID:\tTransaction Date:\t Transaction Type:\t Amount\t\t Pending?")
 
     for rows in trans:
-        print(f"{rows[0]}\t\t{rows[1]}\t\t {rows[4]}\t\t {rows[3]}\t\t {rows[2]}")
+        print(f"{rows[3]}\t\t{rows[4]}\t\t {rows[2]}\t\t {rows[1]}\t\t {rows[5]}")
 
     choice = 0
     while not(choice == 1):
@@ -546,7 +520,7 @@ def e_pending_trans(e_id, f):
     print("Account ID:\tTransaction Date:\t Transaction Type:\t Amount\t\t Pending?")
 
     for rows in trans:
-        print(f"{rows[0]}\t\t{rows[1]}\t\t {rows[4]}\t\t {rows[3]}\t\t {rows[2]}")
+        print(f"{rows[3]}\t\t{rows[4]}\t\t {rows[2]}\t\t {rows[1]}\t\t {rows[5]}")
 
     choice = 0
     while not(choice == 1):
@@ -554,35 +528,31 @@ def e_pending_trans(e_id, f):
     
     e_account_management(e_id, f)
  
-# Withdrawl, Deposit, Transfer, and External transfer - Employees
+# Withdrawal, Deposit, Transfer, and External transfer - Employees
 def e_account_transaction(e_id, f):
     choice = 0
-    try:
-        while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
-            print("\nPlease, select an option from below:")
-            print("1 - Withdrawl")
-            print("2 - Deposit")
-            print("3 - Transfer")
-            print("4 - External transfer")
-            print("5 - Go back")
-            choice = int(input("\nPlease choose an option to continue: "))
-            if choice == 1:
-                e_Withdrawl(e_id, f)
-            elif choice == 2:
-                e_deposit(e_id, f)
-            elif choice == 3:
-                e_transfer(e_id, f)
-            elif choice == 4:
-                e_external_transfer(e_id, f)
-            elif choice == 5:
-                employee_controls(e_id, f)
-            else:
-                print("Please choose an option from above")
-    except:
-        print("Invalid option try again")
-        e_account_transaction(e_id, f)
+    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
+        print("\nPlease, select an option from below:")
+        print("1 - Withdrawal")
+        print("2 - Deposit")
+        print("3 - Transfer")
+        print("4 - External transfer")
+        print("5 - Go back")
+        choice = int(input("\nPlease choose an option to continue: "))
+        if choice == 1:
+            e_Withdrawal(e_id, f)
+        elif choice == 2:
+            e_deposit(e_id, f)
+        elif choice == 3:
+            e_transfer(e_id, f)
+        elif choice == 4:
+            e_external_transfer(e_id, f)
+        elif choice == 5:
+            employee_controls(e_id, f)
+        else:
+            print("Please choose an option from above")
   
-# Withdrawl, Deposit, Transfer, and External transfer - Customer
+# Withdrawal, Deposit, Transfer, and External transfer - Customer
 def c_account_transaction(c_id):
     choice = 0
     while not (choice == 1 and choice == 2 and choice == 3 and choice == 4):
@@ -793,32 +763,27 @@ def c_account_management(c_id):
     print("\nCustomer Account Management Page\n")
 
     choice = 0
-    try:
-        while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
-            print("What would you like to do?")
-            print("1 - Create an account")
-            print("2 - Delete an account")
-            print("3 - Show statement for an account")
-            print("4 - Show pending transactions for an account")
-            print("5 - Go back")
-            choice = int(input("\nPlease choose an option to continue: "))
-
-            if choice == 1:
-                c_create_account(c_id)
-            elif choice == 2:
-                c_delete_account(c_id)
-            elif choice == 3:
-                c_show_statement(c_id)
-            elif choice == 4:
-                c_pending_trans(c_id)
-            elif choice == 5:
-                customer_controls(c_id)
-            else:
-                print("Invalid choice.")
-    except:
-        print("Invalid option try again")
-        c_account_management(c_id)
-
+    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
+        print("What would you like to do?")
+        print("1 - Create an account")
+        print("2 - Delete an account")
+        print("3 - Show statement for an account")
+        print("4 - Show pending transactions for an account")
+        print("5 - Go back")
+        choice = int(input("\nPlease choose an option to continue: "))
+        
+        if choice == 1:
+            c_create_account(c_id)
+        elif choice == 2:
+            c_delete_account(c_id)
+        elif choice == 3:
+            c_show_statement(c_id)
+        elif choice == 4:
+            c_pending_trans(c_id)
+        elif choice == 5:
+            customer_controls(c_id)
+        else:
+            print("Invalid choice.")
 # Customer show statement
 def c_show_statement(c_id):
     print("\nShow statements for an account\n")
@@ -831,10 +796,10 @@ def c_show_statement(c_id):
     cur.execute(f"select * from transactions where extract(year from transaction_date) = '{year}' and extract(month from transaction_date) = '{month}' and account_id={c_id};")
     statement = cur.fetchall()
 
-    print("Account ID:\t Date:\t\tDescription:\t Amount:\t Transaction Type:\t Pending?:")
+    print("Account ID:\t Date:\t\t\t\tDescription:\t\t\t\t\t\t Amount:\t Transaction Type:\t Pending?:")
 
     for rows in statement:
-        print(f"{rows[5]}\t\t {rows[0]}\t{rows[2]}\t\t {rows[3]}\t\t {rows[4]}\t\t {rows[1]}")
+        print(f"{rows[3]}\t\t {rows[4]}\t{rows[0]}\t\t {rows[1]}\t\t {rows[2]}\t\t {rows[5]}")
 
     choice = 0
     while not(choice == 1):
@@ -855,10 +820,10 @@ def e_show_statement(e_id, f):
     cur.execute(f"select * from transactions where extract(year from transaction_date) = '{year}' and extract(month from transaction_date) = '{month}' and account_id={c_id};")
     statement = cur.fetchall()
 
-    print("Account ID:\t Date:\t\tDescription:\t Amount:\t Transaction Type:\t Pending?:")
+    print("Account ID:\t Date:\t\t\t\tDescription:\t\t\t\t\t\t Amount:\t Transaction Type:\t Pending?:")
 
     for rows in statement:
-        print(f"{rows[5]}\t\t {rows[0]}\t{rows[2]}\t\t {rows[3]}\t\t {rows[4]}\t\t {rows[1]}")
+        print(f"{rows[3]}\t\t {rows[4]}\t{rows[0]}\t\t {rows[1]}\t\t {rows[2]}\t\t {rows[5]}")
 
     choice = 0
     while not(choice == 1):
