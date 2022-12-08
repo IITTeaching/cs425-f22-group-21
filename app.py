@@ -90,34 +90,87 @@ def e_deposit(e_id, f):
 def e_transfer(e_id, f):
     choice = 0
     print("Which accounts to transfer money?")
-    try:
-        print("Enter account number: ")
-        input_from = int(input("transfer from: "))
-        input_to = int(input("transfer to: "))
-        cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_from))
-        acc_from = cur.fetchone()
-        cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_to))
-        acc_to = cur.fetchone()
-        input_amount = int(input("Enter amount of money to transfer: "))
-        print("transfer {amount} from account number {ac_num1} to account number {ac_num2}?".format(amount = input_amount, ac_num1 = input_from, ac_num2 = input_to))
-        print("1 - yes")
-        print("2 - no")        
-        choice = int(input("Please choose an option to continue: "))
+    print("Enter account number: ")
+    input_from = int(input("transfer from: "))
+    input_to = int(input("transfer to: "))
 
-        if choice == 1 and acc_from[2] - input_amount >= 0:
-            nbalance_from = acc_from[2] - input_amount
-            nbalance_to = acc_to[2] + input_amount
-            cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = nbalance_from,b = acc_from))
-            cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = nbalance_to,b = acc_to))
-            print("{ac_num1} has balance {amount1}\n{ac_num2} has balance {amount2}".format(amount1 = nbalance_from, amount2 = nbalance_to, ac_num1 = acc_from, ac_num2 = acc_to))
-            cur.execute(f"INSERT INTO Transactions VALUES ('By employee transfer {input_amount} from account number {input_from} to account number {input_to}', {input_amount}, 'Transfer', {acc_from[0]}, CURRENT_TIMESTAMP);")
-            print("\nRedirecting to employee account transaction...")
-            e_account_transaction(e_id, f)
-        elif choice == 2:
-            print("\nRedirecting to employee account transaction...")
-            e_account_transaction(e_id, f)   
-    except:
+    cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_from))
+    acc_from = cur.fetchone()
+    cur.execute("SELECT * FROM Customer WHERE customer_id = '{}'".format(acc_from[0]))
+    cus_from = cur.fetchone()
+
+    cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_to))
+    acc_to = cur.fetchone()
+    cur.execute("SELECT * FROM Customer WHERE customer_id = '{}'".format(acc_to[0]))
+    cus_to = cur.fetchone()
+
+    if(cus_from[3] != cus_to[3]):
+        print("This is an external transfer. Please select external transfer in the option menu")
+        employee_controls(e_id, f)
+
+    input_amount = int(input("Enter amount of money to transfer: "))
+    print("transfer {amount} from account number {ac_num1} to account number {ac_num2}?".format(amount = input_amount, ac_num1 = input_from, ac_num2 = input_to))
+    print("1 - yes")
+    print("2 - no")        
+    choice = int(input("Please choose an option to continue: "))
+
+    if choice == 1 and acc_from[2] - input_amount >= 0:
+        nbalance_from = acc_from[2] - input_amount
+        nbalance_to = acc_to[2] + input_amount
+        cur.execute("UPDATE Account SET balance = {a} WHERE account_num = {b}".format(a = nbalance_from,b = acc_from[1]))
+        cur.execute("UPDATE Account SET balance = {a} WHERE account_num = {b}".format(a = nbalance_to,b = acc_to[1]))
+        print("{ac_num1} has balance {amount1}\n{ac_num2} has balance {amount2}".format(amount1 = nbalance_from, amount2 = nbalance_to, ac_num1 = acc_from[1], ac_num2 = acc_to[1]))
+        cur.execute(f"INSERT INTO Transactions VALUES ('By employee transfer {input_amount} from account number {input_from} to account number {input_to}', {input_amount}, 'Transfer', {acc_from[0]}, CURRENT_TIMESTAMP);")
+        print("\nRedirecting to employee account transaction...")
+        e_account_transaction(e_id, f)
+    elif choice == 2:
+        print("\nRedirecting to employee account transaction...")
+        e_account_transaction(e_id, f)   
+    else:
         print("c_id does not exists or does not have enough money") 
+
+def ext_e_transfer(e_id, f):
+    choice = 0
+    print("Which accounts to transfer money?")
+    print("Enter account number: ")
+    input_from = int(input("transfer from: "))
+    input_to = int(input("transfer to: "))
+
+    cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_from))
+    acc_from = cur.fetchone()
+    cur.execute("SELECT * FROM Customer WHERE customer_id = '{}'".format(acc_from[0]))
+    cus_from = cur.fetchone()
+
+    cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_to))
+    acc_to = cur.fetchone()
+    cur.execute("SELECT * FROM Customer WHERE customer_id = '{}'".format(acc_to[0]))
+    cus_to = cur.fetchone()
+
+    if(cus_from[3] == cus_to[3]):
+        print("This is not an external transfer. Please select regular transfer in the option menu")
+        employee_controls(e_id, f)
+
+    input_amount = int(input("Enter amount of money to transfer: "))
+    print("transfer {amount} from account number {ac_num1} to account number {ac_num2}?".format(amount = input_amount, ac_num1 = input_from, ac_num2 = input_to))
+    print("1 - yes")
+    print("2 - no")        
+    choice = int(input("Please choose an option to continue: "))
+    
+    if choice == 1 and acc_from[2] - input_amount >= 0:
+        nbalance_from = acc_from[2] - input_amount
+        nbalance_to = acc_to[2] + input_amount
+        cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(b = nbalance_from,a = acc_from[1]))
+        cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(b = nbalance_to,a = acc_to[1]))
+        print("{ac_num1} has balance {amount1}\n{ac_num2} has balance {amount2}".format(amount1 = nbalance_from, amount2 = nbalance_to, ac_num1 = acc_from[1], ac_num2 = acc_to[1]))
+        cur.execute(f"INSERT INTO Transactions VALUES ('By employee transfer {input_amount} from account number {input_from} to account number {input_to}', {input_amount}, 'Transfer', {acc_from[0]}, CURRENT_TIMESTAMP);")
+        print("\nRedirecting to employee account transaction...")
+        e_account_transaction(e_id, f)
+    elif choice == 2:
+        print("\nRedirecting to employee account transaction...")
+        e_account_transaction(e_id, f)   
+    else:
+        print("c_id does not exists or does not have enough money") 
+
 
 def c_ext_transfer(c_id):
     other_accountid = int(input("\nPlease insert [external] account number totransfer money to: "))
@@ -126,7 +179,6 @@ def c_ext_transfer(c_id):
     cur.execute("SELECT * FROM Customer WHERE customer_id = '{}'".format(c_id))
     my_customer = cur.fetchone()
 
-    print(my_account)
     cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(other_accountid))
     other_account = cur.fetchone()
     cur.execute("SELECT * FROM Customer WHERE customer_id = '{}'".format(other_accountid))
@@ -600,7 +652,7 @@ def e_account_transaction(e_id, f):
         elif choice == 3:
             e_transfer(e_id, f)
         elif choice == 4:
-            e_external_transfer(e_id, f)
+            ext_e_transfer(e_id, f)
         elif choice == 5:
             employee_controls(e_id, f)
         else:
