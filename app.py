@@ -679,7 +679,7 @@ def add_fees(e_id, f):
 
                 user_input = 0
                 while not(user_input == 1):
-                    user_input = int(input("\nPlease enter 1 to return back to main scree."))
+                    user_input = int(input("\nPlease enter 1 to return back to main screen."))
 
                 e_account_management(e_id, f)
 
@@ -783,6 +783,7 @@ def c_account_management(c_id):
             customer_controls(c_id)
         else:
             print("Invalid choice.")
+          
 # Customer show statement
 def c_show_statement(c_id):
     print("\nShow statements for an account\n")
