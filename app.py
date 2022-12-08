@@ -3,7 +3,7 @@ import psycopg2
 #import string
 
 connection = {
- "dbname": "example",
+ "dbname": "postgres",
  "user": "postgres",
  "password": "test",
  "port": 5432
@@ -498,9 +498,8 @@ def c_pending_trans(c_id):
     trans = cur.fetchall()
 
     print("Account ID:\tTransaction Date:\t Transaction Type:\t Amount\t\t Pending?")
-
     for rows in trans:
-        print(f"{rows[3]}\t\t{rows[4]}\t\t {rows[2]}\t\t {rows[1]}\t\t {rows[5]}")
+        print(f"{rows[0]}\t\t{rows[1]}\t {rows[4]}\t {rows[3]}\t {rows[2]}")
 
     choice = 0
     while not(choice == 1):
