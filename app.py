@@ -139,9 +139,9 @@ def c_transfer (c_id):
         if choice == 1 and my_account[2] - amount >= 0:
             my_new_balance = my_account[2] - amount
             other_new_balance = other_account[2] + amount
-            sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(my_new_balance, my_account)
+            sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(my_new_balance, my_account[0])
             cur.execute(sql)
-            sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(other_new_balance, other_account)
+            sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(other_new_balance, other_account[0])
             cur.execute(sql)
             cur.execute("SELECT customer_username FROM Customer WHERE '{}'=customer_id".format(c_id))
             user_name = cur.fetchone()[0]
