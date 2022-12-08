@@ -22,29 +22,29 @@ cur = conn.cursor()
 
 # Withdrawl, Deposit, Transfer, and External transfer
 # This can be accessed by managers, customers (for their own accounts), and tellers
-def e_account_transaction(e_id, f):
-    choice = 0
-    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
-        print("\nPlease, select an option from below:")
-        print("1 - Withdrawl")
-        print("2 - Deposit")
-        print("3 - Transfer")
-        print("4 - External transfer")
-        print("5 - Go back")
-        choice = int(input("\nPlease choose an option to continue: "))
-
-        if choice == 1:
-            e_Withdrawl(e_id, f)
-        elif choice == 2:
-            e_deposit(e_id, f)
-        elif choice == 3:
-            e_transfer(e_id, f)
-        elif choice == 4:
-            e_external_transfer(e_id, f)
-        elif choice == 5:
-            employee_controls(e_id, f)
-        else:
-            print("Please choose an option from above")
+#def e_account_transaction(e_id, f):
+#    choice = 0
+#    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
+#        print("\nPlease, select an option from below:")
+#        print("1 - Withdrawl")
+#        print("2 - Deposit")
+#        print("3 - Transfer")
+#        print("4 - External transfer")
+#        print("5 - Go back")
+#        choice = int(input("\nPlease choose an option to continue: "))
+#
+#        if choice == 1:
+#            e_Withdrawl(e_id, f)
+#        elif choice == 2:
+#            e_deposit(e_id, f)
+#        elif choice == 3:
+#            e_transfer(e_id, f)
+#        elif choice == 4:
+#            e_external_transfer(e_id, f)
+#        elif choice == 5:
+#            employee_controls(e_id, f)
+#        else:
+#            print("Please choose an option from above")
 
 # Not sure what to do
 def e_external_transfer():
@@ -58,6 +58,13 @@ def e_Withdrawl(e_id, f):
         input_num = int(input("Enter account number: "))
         cur.execute("SELECT * FROM Account WHERE account_num = '{}';".format(input_num))
         acc = cur.fetchone()
+        cur.execute("SELECT ")
+        cur.execute(f"SELECT account_type FROM AccountType WHERE account_id = '{acc[0]}'")
+        acc_type = cur.fetchone()[0]
+        if acc_type[0] == 'Savings':
+            print("Cannot withdraw from savings account")
+            print("\nRedirecting to employee account transaction...")
+            e_account_transaction(e_id, f)  
         input_amount = int(input("Enter amount of money to withdraw: "))
         print("Withdraw {amount} from account number {ac_num}?".format(amount = input_amount, ac_num = input_num))
         print("1 - yes")
@@ -68,7 +75,7 @@ def e_Withdrawl(e_id, f):
             new_balance = acc[2] - input_amount
             cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = input_num,b = new_balance))
             print("{ac_num} has balance {amount}".format(amount = new_balance, ac_num = input_num))
-            cur.execute("INSERT INTO Transaction VALUES ('By employee Withdraw {amount} from account number {ac_num}', {amount}, 'Withdrawl', {ac_id}, CURRENT_TIMESTAMP);".format(amount = input_amount, ac_id = acc[0], ac_num = input_num))
+            cur.execute(f"INSERT INTO Transactions VALUES ('By employee Withdraw {input_amount} from account number {input_num}', {input_amount}, 'Withdrawl', {acc[0]}, CURRENT_TIMESTAMP);")
             print("\nRedirecting to employee account transaction...")
             e_account_transaction(e_id, f)
             
@@ -92,19 +99,18 @@ def e_deposit(e_id, f):
         print("1 - yes")
         print("2 - no")        
         choice = int(input("Please choose an option to continue: "))
-
         if choice == 1:
-            new_balance = acc[4] + input_amount
+            new_balance = acc[2] + input_amount
             cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = input_num,b = new_balance))
             print("{ac_num} has balance {amount}".format(amount = new_balance, ac_num = input_num))
-            cur.execute("INSERT INTO Transaction VALUES ('By employee deposit {amount} from account number {ac_num}', {amount}, 'Deposit', {ac_id}, CURRENT_TIMESTAMP);".format(amount = input_amount, ac_num = input_num, ac_id = acc[0]))
+            cur.execute(f"INSERT INTO Transactions VALUES ('By employee deposit {input_amount} from account number {acc[0]}', {amount}, 'Deposit', {input_amount}, CURRENT_TIMESTAMP);")
             print("\nRedirecting to employee account transaction...")
             e_account_transaction(e_id, f)
         elif choice == 2:
             print("\nRedirecting to employee account transaction...")
             e_account_transaction(e_id, f)   
     except:
-        print("c_id does not exists or does not have enough moeny")
+        print("c_id does not exists or does not have enough money")
 
 # Employee transfer
 def e_transfer(e_id, f):
@@ -124,20 +130,20 @@ def e_transfer(e_id, f):
         print("2 - no")        
         choice = int(input("Please choose an option to continue: "))
 
-        if choice == 1 and acc_from[4] - input_amount >= 0:
-            nbalance_from = acc_from[4] - input_amount
-            nbalance_to = acc_to[4] + input_amount
+        if choice == 1 and acc_from[2] - input_amount >= 0:
+            nbalance_from = acc_from[2] - input_amount
+            nbalance_to = acc_to[2] + input_amount
             cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = nbalance_from,b = acc_from))
             cur.execute("UPDATE Account SET balance = {b} WHERE account_num = {a}".format(a = nbalance_to,b = acc_to))
             print("{ac_num1} has balance {amount1}\n{ac_num2} has balance {amount2}".format(amount1 = nbalance_from, amount2 = nbalance_to, ac_num1 = acc_from, ac_num2 = acc_to))
-            cur.execute("INSERT INTO Transaction VALUES ('By employee transfer {amount} from account number {ac_num1} to account number {ac_num2}', {amount}, 'Transfer', {ac_id}, CURRENT_TIMESTAMP);".format(amount = input_amount, ac_num1 = input_from, ac_num2 = input_to, ac_id = acc_from[0]))
+            cur.execute(f"INSERT INTO Transactions VALUES ('By employee transfer {input_amount} from account number {input_from} to account number {input_to}', {input_amount}, 'Transfer', {acc_from[0]}, CURRENT_TIMESTAMP);")
             print("\nRedirecting to employee account transaction...")
             e_account_transaction(e_id, f)
         elif choice == 2:
             print("\nRedirecting to employee account transaction...")
             e_account_transaction(e_id, f)   
     except:
-        print("c_id does not exists or does not have enough moeny") 
+        print("c_id does not exists or does not have enough money") 
 
 # Custumer transfer
 def c_transfer (c_id):
@@ -156,17 +162,17 @@ def c_transfer (c_id):
         print("2 - no")
         choice = int(input("\nPlease choose an option to continue: "))
 
-        if choice == 1 and my_account[4] - amount >= 0:
-            my_new_balance = my_account[4] - amount
-            other_new_balance = other_account[4] + amount
+        if choice == 1 and my_account[2] - amount >= 0:
+            my_new_balance = my_account[2] - amount
+            other_new_balance = other_account[2] + amount
             sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(my_new_balance, my_account)
             cur.execute(sql)
             sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(other_new_balance, other_account)
             cur.execute(sql)
             cur.execute("SELECT customer_username FROM Customer WHERE '{}'=customer_id".format(c_id))
-            user_name = cur.fetchone()
-            cur.execute("INSERT INTO Transaction VALUES ('By {user1} transfer {amount} from account number {ac_num1} to account number {ac_num2}', {amount}, 'Transfer', {ac_id}, CURRENT_TIMESTAMP);".format(user1 = user_name, amount = amount, ac_num1 = my_account[1], ac_num2 = other_account[1], ac_id = c_id))
-            print(f"\n Your current balance is :{my_new_balance[5]}")
+            user_name = cur.fetchone()[0]
+            cur.execute(f"INSERT INTO Transactions VALUES ('By {user_name} transfer {amount} from account number {my_account[1]} to account number {other_account[1]}', {amount}, 'Transfer', {c_id}, CURRENT_TIMESTAMP);")
+            print(f"\n Your current balance is :{my_new_balance}")
             print("\nRedirecting to customer controls...")
             customer_controls(c_id)
 
@@ -181,7 +187,7 @@ def c_deposit (c_id):
     amount = int(input("\nHow much would you like to deposit to your account?"))
     cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(c_id))
     account = cur.fetchone()
-    print("\n depositing ", amount, " to your current balance of ", account[2])
+    print("\n depositing", amount, "to your current balance of", account[2])
     choice = 0
     while not (choice == 1 and choice == 2):
         print('\n Please, confirm the transaction:')
@@ -194,9 +200,9 @@ def c_deposit (c_id):
             sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(new_balance, c_id)
             cur.execute(sql)
             cur.execute("SELECT customer_username FROM Customer WHERE '{}'=customer_id".format(c_id))
-            user_name = cur.fetchone()
-            cur.execute("INSERT INTO Transaction VALUES ('By {user} deposit {amount} from account number {ac_num}', {amount}, 'Deposit', {ac_id}, CURRENT_TIMESTAMP);".format(user = user_name, amount = amount, ac_num = account[1], ac_id = c_id))
-            print(f"\n Your current balance is :{account[2]}")
+            user_name = cur.fetchone()[0]
+            cur.execute(f"INSERT INTO Transactions VALUES ('By {user_name} deposit {amount} from account number {account[1]}', {amount}, 'Deposit', {c_id}, CURRENT_TIMESTAMP);")
+            print(f"\n Your current balance is :{new_balance}")
             print("\nRedirecting to customer controls...")
             customer_controls(c_id)
 
@@ -211,7 +217,7 @@ def c_withdrawal(c_id):
     amount = int(input("\nHow much would you like to withdraw from your account?"))
     cur.execute("SELECT * FROM Account WHERE account_id = '{}'".format(c_id))
     account = cur.fetchone()
-    print("\n withdrawing ", amount, " to your current balance of ", account[2])
+    print("\n withdrawing", amount, "to your current balance of", account[2])
     choice = 0
     while not (choice == 1 and choice == 2):
         print('\n Please, confirm the transaction:')
@@ -224,9 +230,9 @@ def c_withdrawal(c_id):
             sql = "UPDATE account SET balance = {} WHERE account_id = '{}'".format(new_balance, c_id)
             cur.execute(sql)
             cur.execute("SELECT customer_username FROM Customer WHERE '{}'=customer_id".format(c_id))
-            user_name = cur.fetchone()
-            cur.execute("INSERT INTO Transaction VALUES ('By {user} Withdraw {amount} from account number {ac_num}', {amount}, 'Withdrawl', {ac_id}, CURRENT_TIMESTAMP);".format(user = user_name, amount = amount, ac_num = account[1], ac_id = c_id))
-            print(f"\n Your current balance is :{account[2]}")
+            user_name = cur.fetchone()[0]
+            cur.execute(f"INSERT INTO Transactions VALUES ('By {user_name} Withdraw {amount} from account number {account[1]}', {amount}, 'Withdrawal', {c_id}, CURRENT_TIMESTAMP);")#.format(user = user_name, amount = amount, ac_num = account[1], ac_id = c_id))
+            print(f"\n Your current balance is :{new_balance}")
             print("\nRedirecting to customer controls...")
             customer_controls(c_id)
 
@@ -325,7 +331,7 @@ def account_type(c_id):
                 return False
           
 # Manager create customer account
-def c_create_account1(e_id, f):
+def e_create_account(e_id, f):
     print("\nWelcome to Account Creation!\n")
 
     cust_id = new_cid()
@@ -368,7 +374,7 @@ def c_create_account1(e_id, f):
         pass
     
 # Customer create customer account
-def c_create_account2(c_id):
+def c_create_account(c_id):
     print("\nWelcome to Account Creation!\n")
 
     cust_id = new_cid()
@@ -460,8 +466,7 @@ def e_delete_account(e_id, f):
         print("Redirecting back to Account Management Page....\n")
         e_account_management(e_id, f)
         pass
-        
-          
+             
 # Customer customer Account Deletion
 def c_delete_account(c_id):
     print("\nCustomer Account Deletion Page\n")
@@ -552,29 +557,30 @@ def e_pending_trans(e_id, f):
 # Withdrawl, Deposit, Transfer, and External transfer - Employees
 def e_account_transaction(e_id, f):
     choice = 0
-    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
-        print("\nPlease, select an option from below:")
-        print("1 - Withdrawl")
-        print("2 - Deposit")
-        print("3 - Transfer")
-        print("4 - External transfer")
-        print("5 - Go back")
-        choice = int(input("\nPlease choose an option to continue: "))
-
-        cur.execute(f"SELECT account_type FROM AccountType WHERE account_id = '{c_id}'")
-        acc_type = cur.fetchone()[0]
-        if choice == 1 and acc_type == 'Checkings':
-            e_Withdrawl(e_id, f)
-        elif choice == 2:
-            e_deposit(e_id, f)
-        elif choice == 3 and acc_type == 'Checkings':
-            e_transfer(e_id, f)
-        elif choice == 4:
-            e_external_transfer(e_id, f)
-        elif choice == 5:
-            employee_controls(e_id, f)
-        else:
-            print("Please choose an option from above")
+    try:
+        while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
+            print("\nPlease, select an option from below:")
+            print("1 - Withdrawl")
+            print("2 - Deposit")
+            print("3 - Transfer")
+            print("4 - External transfer")
+            print("5 - Go back")
+            choice = int(input("\nPlease choose an option to continue: "))
+            if choice == 1:
+                e_Withdrawl(e_id, f)
+            elif choice == 2:
+                e_deposit(e_id, f)
+            elif choice == 3:
+                e_transfer(e_id, f)
+            elif choice == 4:
+                e_external_transfer(e_id, f)
+            elif choice == 5:
+                employee_controls(e_id, f)
+            else:
+                print("Please choose an option from above")
+    except:
+        print("Invalid option try again")
+        e_account_transaction(e_id, f)
   
 # Withdrawl, Deposit, Transfer, and External transfer - Customer
 def c_account_transaction(c_id):
@@ -595,7 +601,7 @@ def c_account_transaction(c_id):
             c_deposit(c_id)
         elif choice == 3 and acc_type == 'Checkings':
             c_transfer(c_id)
-        elif userInput == 4:
+        elif choice == 4:
             print("\nRedirecting to customer controls...")
             customer_controls(c_id)
         else:
@@ -787,27 +793,31 @@ def c_account_management(c_id):
     print("\nCustomer Account Management Page\n")
 
     choice = 0
-    while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
-        print("What would you like to do?")
-        print("1 - Create an account")
-        print("2 - Delete an account")
-        print("3 - Show statement for an account")
-        print("4 - Show pending transactions for an account")
-        print("5 - Go back")
-        choice = int(input("\nPlease choose an option to continue: "))
+    try:
+        while not(choice == 1 and choice == 2 and choice == 3 and choice == 4 and choice == 5):
+            print("What would you like to do?")
+            print("1 - Create an account")
+            print("2 - Delete an account")
+            print("3 - Show statement for an account")
+            print("4 - Show pending transactions for an account")
+            print("5 - Go back")
+            choice = int(input("\nPlease choose an option to continue: "))
 
-        if choice == 1:
-            c_create_account(c_id)
-        elif choice == 2:
-            c_delete_account(c_id)
-        elif choice == 3:
-            c_show_statement(c_id)
-        elif choice == 4:
-            c_pending_trans(c_id)
-        elif choice == 5:
-            customer_controls(c_id)
-        else:
-            print("Invalid choice.")
+            if choice == 1:
+                c_create_account(c_id)
+            elif choice == 2:
+                c_delete_account(c_id)
+            elif choice == 3:
+                c_show_statement(c_id)
+            elif choice == 4:
+                c_pending_trans(c_id)
+            elif choice == 5:
+                customer_controls(c_id)
+            else:
+                print("Invalid choice.")
+    except:
+        print("Invalid option try again")
+        c_account_management(c_id)
 
 # Customer show statement
 def c_show_statement(c_id):
