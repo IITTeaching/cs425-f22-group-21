@@ -293,16 +293,16 @@ def new_cid():
 # Choose an account type for account creation
 def account_type(c_id):
     choice = 0
-    account_num = ''.join(random.choice(string.digits) for _ in range(10))
+    account_num = ''.join(random.choice(string.digits) for _ in range(8))
     balance = 0
 
     while not(choice == 1 and choice == 2):
         print("\nChoose an account type:")
         print("1 - Checkings")
         print("2 - Savings")
-        choice = int(input("Please choose an option: "))
+        choice = input("Please choose an option: ")
 
-        if choice == 1:
+        if int(choice) == 1:
             try:
                 cur.execute(f"INSERT INTO Account VALUES ({c_id}, {account_num}, {balance});")
                 cur.execute(f"INSERT INTO AccountType VALUES ('Checkings', {0}, 'FALSE', {0}, {0}, {c_id});")
@@ -313,7 +313,7 @@ def account_type(c_id):
                 print("Error occured while creating 'Checkings' account\n", e)
                 return False
 
-        elif choice == 2:
+        elif int(choice) == 2:
             try:
                 cur.execute(f"INSERT INTO Account VALUES ({c_id}, {account_num}, {balance});")
                 cur.execute(f"INSERT INTO AccountType VALUES ('Savings', {0}, 'FALSE', {0}, {0}, {c_id});")
@@ -325,17 +325,10 @@ def account_type(c_id):
                 return False
           
 # Manager create customer account
-def e_create_account(e_id, f):
+def c_create_account1(e_id, f):
     print("\nWelcome to Account Creation!\n")
 
     cust_id = new_cid()
-
-    worked = account_type(cust_id)
-
-    if worked:
-        pass # leave as is
-    else:
-        e_account_management(e_id, f)
 
     first_name = input("Enter first name: ")
     last_name = input("Enter last name: ")
@@ -350,26 +343,35 @@ def e_create_account(e_id, f):
     while len(password) > 13:
         password = input("Create a new password (max characters is 12): ")
 
-    # Insert inputted values into Customer table
-    cur.execute(f"INSERT INTO Customer VALUES ({cust_id}, '{user_name}', '{password}', {home_branch_id}, '{first_name}', '{last_name}', {lives_at_id});")
-    conn.commit()
+    try:
+        # Insert inputted values into Customer table
+        cur.execute(f"INSERT INTO Customer VALUES ({cust_id}, '{user_name}', '{password}', {home_branch_id}, '{first_name}', '{last_name}', {lives_at_id});")
+        conn.commit()
 
-    print(f"\nSuccessfully created an account for {first_name} {last_name}!\n")
-    print("\nBringing you back to Account Management page...")
-    e_account_management(e_id, f) # Brings back to Manager Account
+        worked = account_type(cust_id)
+
+        if worked:
+            pass # leave as is
+        else:
+            e_account_management(e_id, f)
+            pass
+
+        print(f"\nSuccessfully created an account for {first_name} {last_name}!\n")
+        print("\nBringing you back to Account Management page...")
+        e_account_management(e_id, f) # Brings back to Manager Account
+        pass
+
+    except Exception as e:
+        print(f"Error occured while trying to create account for {first_name} {last_name}\n", e)
+        print("\nBringing you back to Account Management page...")
+        e_account_management(e_id, f) # Brings back to Manager Account
+        pass
     
 # Customer create customer account
-def c_create_account(c_id):
+def c_create_account2(c_id):
     print("\nWelcome to Account Creation!\n")
 
     cust_id = new_cid()
-
-    worked = account_type(cust_id)
-
-    if worked:
-        pass # leave as is
-    else:
-        c_account_management(c_id)
 
     first_name = input("Enter first name: ")
     last_name = input("Enter last name: ")
@@ -384,13 +386,29 @@ def c_create_account(c_id):
     while len(password) > 13:
         password = input("Create a new password (max characters is 12): ")
 
-    # Insert inputted values into Customer table
-    cur.execute(f"INSERT INTO Customer VALUES ({cust_id}, '{user_name}', '{password}', {home_branch_id}, '{first_name}', '{last_name}', {lives_at_id});")
-    conn.commit()
+    try:
+        # Insert inputted values into Customer table
+        cur.execute(f"INSERT INTO Customer VALUES ({cust_id}, '{user_name}', '{password}', {home_branch_id}, '{first_name}', '{last_name}', {lives_at_id});")
+        conn.commit()
 
-    print(f"\nSuccessfully created an account for {first_name} {last_name}!\n")
-    print("\nBringing you back to Account Management page...")
-    c_account_management(c_id) # Brings back to customer account
+        worked = account_type(cust_id)
+
+        if worked:
+            pass # leave as is
+        else:
+            c_account_management(c_id)
+            pass
+
+        print(f"\nSuccessfully created an account for {first_name} {last_name}!\n")
+        print("\nBringing you back to Account Management page...")
+        c_account_management(c_id) # Brings back to customer Account
+        pass
+
+    except Exception as e:
+        print(f"Error occured while trying to create account for {first_name} {last_name}\n", e)
+        print("\nBringing you back to Account Management page...")
+        c_account_management(c_id) # Brings back to customer Account
+        pass
           
 # Manager customer Account Deletion
 def e_delete_account(e_id, f):
@@ -995,6 +1013,7 @@ def e_signIn():
 
 # Main
 userInput = 0
+c_id = 0 # just for parameter reasons
 while not(userInput == 1 and userInput == 2 and  userInput == 3 and userInput == 4):
     print("\nWelcome to the Banking Application\n")
     print("1 - Customer Sign in")
@@ -1006,7 +1025,7 @@ while not(userInput == 1 and userInput == 2 and  userInput == 3 and userInput ==
     if userInput == 1:
         c_signIn()
     elif userInput == 2:
-        c_create_account()  # need to change the page they are brought back to-- currently goes to account management
+        c_create_account(c_id)  # need to change the page they are brought back to-- currently goes to account management
     elif userInput == 3:
         e_signIn()
     elif userInput == 4:
