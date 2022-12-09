@@ -9,7 +9,6 @@ connection = {
  "port": 5432
 }
 
-#just wrote e in front of function that employees use and c that customers use
 # Create a connection
 try:
    conn = psycopg2.connect(**connection)
@@ -19,10 +18,6 @@ except:
   
 # Create a cursor
 cur = conn.cursor()
-
-# Not sure what to do
-def e_external_transfer(e_id, f):
-    pass
 
 # Employee withdrawal
 def e_Withdrawal(e_id, f):
